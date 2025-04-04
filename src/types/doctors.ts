@@ -4,3 +4,11 @@ export type Doctor = {
     specialty: string;
     image: string;
   };
+
+  /**
+ * Representa um médico no sistema
+ * @property id - Identificador único do médico
+ * @property name - Nome completo do médico
+ * @property specialty - Especialidade médica
+ * @property image - URL da foto do médico
+ */

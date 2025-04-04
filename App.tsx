@@ -1,9 +1,10 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider } from 'styled-components';
-import AppRoutes from './src/routes';
+import { AppNavigator } from './src/navigation/AppNavigator';
 import theme from './src/styles/theme';
 import { StatusBar } from 'react-native';
+import { AuthProvider } from './src/contexts/AuthContext';
 
 export default function App() {
   return (
