@@ -14,7 +14,7 @@ export default function App() {
           barStyle="light-content" 
           backgroundColor={theme.colors.primary} 
         />
-        <AppRoutes />
+        <AppNavigator />
       </NavigationContainer>
     </ThemeProvider>
   );
