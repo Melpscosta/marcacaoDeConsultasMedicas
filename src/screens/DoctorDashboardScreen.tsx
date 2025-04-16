@@ -136,8 +136,11 @@ const DoctorDashboardScreen: React.FC = () => {
                 <ListItem.Subtitle style={styles.dateTime as TextStyle}>
                   {appointment.date} às {appointment.time}
                 </ListItem.Subtitle>
-                <ListItem.Title style={styles.dateTime as TextStyle}>
-                  {appointment.date} às {appointment.time}
+                <Text style={styles.specialty as TextStyle}>
+                  {appointment.specialty}
+                </Text>
+                <ListItem.Title style={styles.patientName as TextStyle}>
+                  Paciente: {appointment.patientName || "Nome não disponível"}
                 </ListItem.Title>
                 <StatusBadge status={appointment.status}>
                   <StatusText status={appointment.status}>
@@ -183,12 +186,12 @@ const DoctorDashboardScreen: React.FC = () => {
 const styles = {
   patientName: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     color: theme.colors.text,
   },
   specialty: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     color: theme.colors.text,
   },
   scrollContent: {

@@ -113,8 +113,8 @@ const PatientDashboardScreen: React.FC = () => {
           appointments.map((appointment) => (
             <AppointmentCard key={appointment.id}>
               <ListItem.Content>
-                <ListItem.Title style={styles.doctorName as TextStyle}>
-                  {appointment.doctorName}
+                <ListItem.Title style={styles.patientName as TextStyle}>
+                  Paciente: {appointment.patientName}
                 </ListItem.Title>
                 <ListItem.Subtitle style={styles.dateTime as TextStyle}>
                   {appointment.date} às {appointment.time}

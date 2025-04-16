@@ -7,6 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import theme from '../styles/theme';
 import Header from '../components/Header';
+import { ViewStyle } from 'react-native';
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Profile'>;
@@ -132,7 +133,7 @@ const Email = styled.Text`
 `;
 
 const RoleBadge = styled.View<{ role: string }>`
-  background-color: ${(props) => {
+  background-color: ${(props: { role: any; }) => {
     switch (props.role) {
       case 'admin':
         return theme.colors.primary + '20';
