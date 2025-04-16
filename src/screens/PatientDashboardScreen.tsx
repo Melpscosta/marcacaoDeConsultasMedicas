@@ -1,29 +1,30 @@
-import React, { useState } from 'react';
-import styled from 'styled-components/native';
-import { ScrollView, ViewStyle, TextStyle } from 'react-native';
-import { Button, ListItem, Text } from 'react-native-elements';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useFocusEffect } from '@react-navigation/native';
-import { RootStackParamList } from '../types/navigation';
-import theme from '../styles/theme';
-import Header from '../components/Header';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState } from "react";
+import styled from "styled-components/native";
+import { ScrollView, ViewStyle, TextStyle } from "react-native";
+import { Button, ListItem, Text } from "react-native-elements";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useFocusEffect } from "@react-navigation/native";
+import { RootStackParamList } from "../types/navigation";
+import theme from "../styles/theme";
+import Header from "../components/Header";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type PatientDashboardScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'PatientDashboard'>;
+  navigation: NativeStackNavigationProp<RootStackParamList, "PatientDashboard">;
 };
 
 interface Appointment {
   id: string;
   patientId: string;
+  patientName: string;
   doctorId: string;
   doctorName: string;
   date: string;
   time: string;
   specialty: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: "pending" | "confirmed" | "cancelled";
 }
 
 interface StyledProps {
@@ -32,9 +33,9 @@ interface StyledProps {
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'confirmed':
+    case "confirmed":
       return theme.colors.success;
-    case 'cancelled':
+    case "cancelled":
       return theme.colors.error;
     default:
       return theme.colors.warning;
@@ -43,24 +44,26 @@ const getStatusColor = (status: string) => {
 
 const getStatusText = (status: string) => {
   switch (status) {
-    case 'confirmed':
-      return 'Confirmada';
-    case 'cancelled':
-      return 'Cancelada';
+    case "confirmed":
+      return "Confirmada";
+    case "cancelled":
+      return "Cancelada";
     default:
-      return 'Pendente';
+      return "Pendente";
   }
 };
 
 const PatientDashboardScreen: React.FC = () => {
   const { user, signOut } = useAuth();
-  const navigation = useNavigation<PatientDashboardScreenProps['navigation']>();
+  const navigation = useNavigation<PatientDashboardScreenProps["navigation"]>();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadAppointments = async () => {
     try {
-      const storedAppointments = await AsyncStorage.getItem('@MedicalApp:appointments');
+      const storedAppointments = await AsyncStorage.getItem(
+        "@MedicalApp:appointments"
+      );
       if (storedAppointments) {
         const allAppointments: Appointment[] = JSON.parse(storedAppointments);
         const userAppointments = allAppointments.filter(
@@ -69,7 +72,7 @@ const PatientDashboardScreen: React.FC = () => {
         setAppointments(userAppointments);
       }
     } catch (error) {
-      console.error('Erro ao carregar consultas:', error);
+      console.error("Erro ao carregar consultas:", error);
     } finally {
       setLoading(false);
     }
@@ -90,14 +93,14 @@ const PatientDashboardScreen: React.FC = () => {
 
         <Button
           title="Agendar Nova Consulta"
-          onPress={() => navigation.navigate('CreateAppointment')}
+          onPress={() => navigation.navigate("CreateAppointment")}
           containerStyle={styles.button as ViewStyle}
           buttonStyle={styles.buttonStyle}
         />
 
         <Button
           title="Meu Perfil"
-          onPress={() => navigation.navigate('Profile')}
+          onPress={() => navigation.navigate("Profile")}
           containerStyle={styles.button as ViewStyle}
           buttonStyle={styles.buttonStyle}
         />
@@ -113,11 +116,14 @@ const PatientDashboardScreen: React.FC = () => {
                 <ListItem.Title style={styles.doctorName as TextStyle}>
                   {appointment.doctorName}
                 </ListItem.Title>
-                <ListItem.Subtitle style={styles.specialty as TextStyle}>
-                  {appointment.specialty}
-                </ListItem.Subtitle>
-                <Text style={styles.dateTime as TextStyle}>
+                <ListItem.Subtitle style={styles.dateTime as TextStyle}>
                   {appointment.date} às {appointment.time}
+                </ListItem.Subtitle>
+                <Text style={styles.doctorName as TextStyle}>
+                  {appointment.doctorName}
+                </Text>
+                <Text style={styles.specialty as TextStyle}>
+                  {appointment.specialty}
                 </Text>
                 <StatusBadge status={appointment.status}>
                   <StatusText status={appointment.status}>
@@ -141,12 +147,17 @@ const PatientDashboardScreen: React.FC = () => {
 };
 
 const styles = {
+  patientName: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
   scrollContent: {
     padding: 20,
   },
   button: {
     marginBottom: 20,
-    width: '100%',
+    width: "100%",
   },
   buttonStyle: {
     backgroundColor: theme.colors.primary,
@@ -158,7 +169,7 @@ const styles = {
   },
   doctorName: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     color: theme.colors.text,
   },
   specialty: {
@@ -210,7 +221,8 @@ const EmptyText = styled.Text`
 `;
 
 const StatusBadge = styled.View<StyledProps>`
-  background-color: ${(props: StyledProps) => getStatusColor(props.status) + '20'};
+  background-color: ${(props: StyledProps) =>
+    getStatusColor(props.status) + "20"};
   padding: 4px 8px;
   border-radius: 4px;
   align-self: flex-start;
@@ -223,4 +235,4 @@ const StatusText = styled.Text<StyledProps>`
   font-weight: 500;
 `;
 
-export default PatientDashboardScreen; 
+export default PatientDashboardScreen;
