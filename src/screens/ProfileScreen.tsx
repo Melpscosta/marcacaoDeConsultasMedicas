@@ -7,6 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import theme from '../styles/theme';
 import Header from '../components/Header';
+import ProfileImagePicker from '../components/ProfileImagePicker';
 import { ViewStyle } from 'react-native';
 
 type ProfileScreenProps = {
@@ -37,7 +38,12 @@ const ProfileScreen: React.FC = () => {
         <Title>Meu Perfil</Title>
 
         <ProfileCard>
-          <Avatar source={{ uri: user?.image || 'https://via.placeholder.com/150' }} />
+          <ProfileImagePicker
+            currentImageUri={user?.image}
+            onImageSelected={() => {}} // Read-only na tela de perfil
+            size={120}
+            editable={false}
+          />
           <Name>{user?.name}</Name>
           <Email>{user?.email}</Email>
           <RoleBadge role={user?.role || ''}>
@@ -48,6 +54,13 @@ const ProfileScreen: React.FC = () => {
             <SpecialtyText>Especialidade: {user?.specialty}</SpecialtyText>
           )}
         </ProfileCard>
+
+        <Button
+          title="Editar Perfil"
+          onPress={() => navigation.navigate('EditProfile' as any)}
+          containerStyle={styles.button as ViewStyle}
+          buttonStyle={styles.editButton}
+        />
 
         <Button
           title="Voltar"
@@ -77,6 +90,10 @@ const styles = {
   },
   buttonStyle: {
     backgroundColor: theme.colors.primary,
+    paddingVertical: 12,
+  },
+  editButton: {
+    backgroundColor: theme.colors.success,
     paddingVertical: 12,
   },
   logoutButton: {
@@ -112,12 +129,7 @@ const ProfileCard = styled.View`
   border-color: ${theme.colors.border};
 `;
 
-const Avatar = styled.Image`
-  width: 120px;
-  height: 120px;
-  border-radius: 60px;
-  margin-bottom: 16px;
-`;
+// Avatar removido - agora usamos o ProfileImagePicker
 
 const Name = styled.Text`
   font-size: 20px;
@@ -133,7 +145,7 @@ const Email = styled.Text`
 `;
 
 const RoleBadge = styled.View<{ role: string }>`
-  background-color: ${(props: any) => {
+  background-color: ${(props: { role: string }) => {
     switch (props.role) {
       case 'admin':
         return theme.colors.primary + '20';
