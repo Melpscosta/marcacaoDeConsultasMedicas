@@ -1,158 +1,225 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { ViewStyle } from 'react-native';
-import { Card, Text, Avatar } from '@rneui/themed';
+import { Modal, ViewStyle } from 'react-native';
+import { Button, Input } from 'react-native-elements';
 import theme from '../styles/theme';
 
-interface AppointmentCardProps {
-  doctorName: string;
-  date: string;
-  time: string;
-  specialty: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
-  onPress?: () => void;
-  style?: ViewStyle;
+interface AppointmentActionModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onConfirm: (reason?: string) => void;
+  actionType: 'confirm' | 'cancel';
+  appointmentDetails: {
+    patientName: string;
+    doctorName: string;
+    date: string;
+    time: string;
+    specialty: string;
+  };
 }
 
-const AppointmentCard: React.FC<AppointmentCardProps> = ({
-  doctorName,
-  date,
-  time,
-  specialty,
-  status,
-  onPress,
-  style,
+const AppointmentActionModal: React.FC<AppointmentActionModalProps> = ({
+  visible,
+  onClose,
+  onConfirm,
+  actionType,
+  appointmentDetails,
 }) => {
-  const getStatusColor = () => {
-    switch (status) {
-      case 'confirmed':
-        return theme.colors.success;
-      case 'cancelled':
-        return theme.colors.error;
-      default:
-        return theme.colors.primary;
-    }
+  const [reason, setReason] = React.useState('');
+
+  const handleConfirm = () => {
+    onConfirm(reason.trim() || undefined);
+    setReason('');
+    onClose();
   };
 
+  const handleClose = () => {
+    setReason('');
+    onClose();
+  };
+
+  const isCancel = actionType === 'cancel';
+
   return (
-    <Card containerStyle={[styles.card, style]}>
-      <DoctorInfo>
-        <Avatar
-          size="medium"
-          rounded
-          source={{ uri: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 10)}.jpg` }}
-          containerStyle={styles.avatar}
-        />
-        <TextContainer>
-          <DoctorName>{doctorName}</DoctorName>
-          <Specialty>{specialty}</Specialty>
-        </TextContainer>
-      </DoctorInfo>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={handleClose}
+    >
+      <Overlay>
+        <ModalContainer>
+          <Header>
+            <Title>
+              {isCancel ? 'Cancelar Consulta' : 'Confirmar Consulta'}
+            </Title>
+          </Header>
 
-      <AppointmentInfo>
-        <InfoRow>
-          <InfoLabel>Data:</InfoLabel>
-          <InfoValue>{date}</InfoValue>
-        </InfoRow>
-        <InfoRow>
-          <InfoLabel>Horário:</InfoLabel>
-          <InfoValue>{time}</InfoValue>
-        </InfoRow>
-      </AppointmentInfo>
+          <Content>
+            <AppointmentInfo>
+              <InfoRow>
+                <InfoLabel>Paciente:</InfoLabel>
+                <InfoValue>{appointmentDetails.patientName}</InfoValue>
+              </InfoRow>
+              <InfoRow>
+                <InfoLabel>Médico:</InfoLabel>
+                <InfoValue>{appointmentDetails.doctorName}</InfoValue>
+              </InfoRow>
+              <InfoRow>
+                <InfoLabel>Especialidade:</InfoLabel>
+                <InfoValue>{appointmentDetails.specialty}</InfoValue>
+              </InfoRow>
+              <InfoRow>
+                <InfoLabel>Data/Hora:</InfoLabel>
+                <InfoValue>{appointmentDetails.date} às {appointmentDetails.time}</InfoValue>
+              </InfoRow>
+            </AppointmentInfo>
 
-      <StatusContainer>
-        <StatusDot color={getStatusColor()} />
-        <Text style={{ color: getStatusColor() }}>
-          {status === 'confirmed' ? 'Confirmada' : status === 'cancelled' ? 'Cancelada' : 'Pendente'}
-        </Text>
-      </StatusContainer>
-    </Card>
+            {isCancel && (
+              <ReasonContainer>
+                <Input
+                  label="Motivo do cancelamento (opcional)"
+                  placeholder="Digite o motivo..."
+                  value={reason}
+                  onChangeText={setReason}
+                  multiline
+                  numberOfLines={3}
+                  containerStyle={styles.reasonInput}
+                />
+              </ReasonContainer>
+            )}
+
+            <ConfirmationText isCancel={isCancel}>
+              {isCancel 
+                ? 'Tem certeza que deseja cancelar esta consulta?'
+                : 'Tem certeza que deseja confirmar esta consulta?'
+              }
+            </ConfirmationText>
+          </Content>
+
+          <ButtonContainer>
+            <Button
+              title="Cancelar"
+              onPress={handleClose}
+              containerStyle={styles.cancelButton as ViewStyle}
+              buttonStyle={styles.cancelButtonStyle}
+            />
+            <Button
+              title={isCancel ? 'Confirmar Cancelamento' : 'Confirmar'}
+              onPress={handleConfirm}
+              containerStyle={styles.confirmButton as ViewStyle}
+              buttonStyle={[
+                styles.confirmButtonStyle,
+                { backgroundColor: isCancel ? theme.colors.error : theme.colors.success }
+              ]}
+            />
+          </ButtonContainer>
+        </ModalContainer>
+      </Overlay>
+    </Modal>
   );
 };
 
 const styles = {
-  card: {
-    borderRadius: 10,
-    marginHorizontal: 0,
-    marginVertical: 8,
-    padding: 15,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+  reasonInput: {
+    marginBottom: 10,
   },
-  avatar: {
-    backgroundColor: theme.colors.primary,
+  cancelButton: {
+    flex: 1,
+    marginRight: 8,
+  },
+  confirmButton: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  cancelButtonStyle: {
+    backgroundColor: theme.colors.secondary,
+    paddingVertical: 12,
+  },
+  confirmButtonStyle: {
+    paddingVertical: 12,
   },
 };
 
-const CardContent = styled.View`
-  padding: 10px;
-`;
-
-const DoctorInfo = styled.View`
-  flex-direction: row;
+const Overlay = styled.View`
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
   align-items: center;
-  margin-bottom: 15px;
+  padding: 20px;
 `;
 
-const TextContainer = styled.View`
-  margin-left: 15px;
+const ModalContainer = styled.View`
+  background-color: ${theme.colors.white};
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  shadow-color: ${theme.colors.text};
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.25;
+  shadow-radius: 4px;
+  elevation: 5;
 `;
 
-const DoctorName = styled.Text`
-  font-size: 18px;
+const Header = styled.View`
+  padding: 20px 20px 10px 20px;
+  border-bottom-width: 1px;
+  border-bottom-color: ${theme.colors.border};
+`;
+
+const Title = styled.Text`
+  font-size: 20px;
   font-weight: bold;
   color: ${theme.colors.text};
+  text-align: center;
 `;
 
-const Specialty = styled.Text`
-  font-size: 14px;
-  color: ${theme.colors.text};
-  opacity: 0.7;
+const Content = styled.View`
+  padding: 20px;
 `;
 
 const AppointmentInfo = styled.View`
-  margin-bottom: 15px;
+  background-color: ${theme.colors.background};
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
 `;
 
 const InfoRow = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  marginBottom: 5px;
+  margin-bottom: 8px;
 `;
 
 const InfoLabel = styled.Text`
   font-size: 14px;
   color: ${theme.colors.text};
-  opacity: 0.7;
+  font-weight: 500;
 `;
 
 const InfoValue = styled.Text`
   font-size: 14px;
   color: ${theme.colors.text};
+  font-weight: 400;
+  flex: 1;
+  text-align: right;
+`;
+
+const ReasonContainer = styled.View`
+  margin-bottom: 16px;
+`;
+
+const ConfirmationText = styled.Text<{ isCancel: boolean }>`
+  font-size: 16px;
+  color: ${(props: { isCancel: boolean }) => props.isCancel ? theme.colors.error : theme.colors.success};
+  text-align: center;
+  margin-bottom: 20px;
   font-weight: 500;
 `;
 
-const StatusContainer = styled.View`
+const ButtonContainer = styled.View`
   flex-direction: row;
-  align-items: center;
-  margin-top: 10px;
+  padding: 0 20px 20px 20px;
 `;
 
-const StatusDot = styled.View<{ color: string }>`
-  width: 8px;
-  height: 8px;
-  border-radius: 4px;
-  background-color: ${(props: { color: string }) => props.color};
-  margin-right: 8px;
-`;
-
-const StatusText = styled.Text<{ color: string }>`
-  fontSize: 14;
-  color: ${(props: { color: string }) => props.color};
-  fontWeight: 500;
-`;
-
-export default AppointmentCard; 
+export default AppointmentActionModal;
