@@ -5,6 +5,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
+// Função de exportação de rotas
+
 export default function AppRoutes() {
   return (
     <Stack.Navigator
