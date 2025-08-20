@@ -3,19 +3,7 @@ import styled from 'styled-components/native';
 import { Avatar } from 'react-native-elements';
 import { useAuth } from '../contexts/AuthContext';
 import theme from '../styles/theme';
-
-export const HeaderContainer = styled.View`
-  background-color: ${theme.colors.background};
-  padding: 16px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${theme.colors.border};
-`;
-
-export const HeaderTitle = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-`;
+import NotificationBell from './NotificationBell';
 
 const Header: React.FC = () => {
   const { user } = useAuth();
@@ -36,6 +24,7 @@ const Header: React.FC = () => {
           <UserName>{user.name}</UserName>
         </TextContainer>
       </UserInfo>
+      <NotificationBell />
     </Container>
   );
 };
@@ -47,12 +36,14 @@ const styles = {
 };
 
 const Container = styled.View`
-  background-color: ${theme.colors.background};
+  background-color: ${theme.colors.primary};
   padding: 16px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   border-bottom-width: 1px;
   border-bottom-color: ${theme.colors.border};
 `;
-
 const UserInfo = styled.View`
   flex-direction: row;
   align-items: center;
@@ -64,14 +55,14 @@ const TextContainer = styled.View`
 
 const WelcomeText = styled.Text`
   font-size: 14px;
-  color: ${theme.colors.text};
-  opacity: 0.7;
+  color: ${theme.colors.white};
+  opacity: 0.9;
 `;
 
 const UserName = styled.Text`
   font-size: 18px;
   font-weight: bold;
-  color: ${theme.colors.text};
+  color: ${theme.colors.white};
 `;
 
 export default Header;

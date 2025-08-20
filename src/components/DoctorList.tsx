@@ -1,68 +1,88 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { Avatar } from 'react-native-elements';
-import { useAuth } from '../contexts/AuthContext';
+import { ViewStyle } from 'react-native';
+import { ListItem, Avatar } from 'react-native-elements';
 import theme from '../styles/theme';
-import NotificationBell from './NotificationBell';
 
-const Header: React.FC = () => {
-  const { user } = useAuth();
+interface Doctor {
+  id: string;
+  name: string;
+  specialty: string;
+  image: string;
+}
 
-  if (!user) return null;
+interface DoctorListProps {
+  doctors: Doctor[];
+  onSelectDoctor: (doctor: Doctor) => void;
+  selectedDoctorId?: string;
+  style?: ViewStyle;
+}
 
+const DoctorList: React.FC<DoctorListProps> = ({
+  doctors,
+  onSelectDoctor,
+  selectedDoctorId,
+  style,
+}) => {
   return (
-    <Container>
-      <UserInfo>
-        <Avatar
-          size="medium"
-          rounded
-          source={{ uri: user.image }}
-          containerStyle={styles.avatar}
-        />
-        <TextContainer>
-          <WelcomeText>Bem-vindo(a),</WelcomeText>
-          <UserName>{user.name}</UserName>
-        </TextContainer>
-      </UserInfo>
-      <NotificationBell />
+    <Container style={style}>
+      {doctors.map((doctor) => (
+        <ListItem
+          key={doctor.id}
+          onPress={() => onSelectDoctor(doctor)}
+          containerStyle={[
+            styles.listItem,
+            selectedDoctorId === doctor.id && styles.selectedItem,
+          ]}
+        >
+          <Avatar
+            size="medium"
+            rounded
+            source={{ uri: doctor.image }}
+            containerStyle={styles.avatar}
+          />
+          <ListItem.Content>
+            <ListItem.Title style={styles.name}>{doctor.name}</ListItem.Title>
+            <ListItem.Subtitle style={styles.specialty}>
+              {doctor.specialty}
+            </ListItem.Subtitle>
+          </ListItem.Content>
+          <ListItem.Chevron />
+        </ListItem>
+      ))}
     </Container>
   );
 };
 
 const styles = {
+  listItem: {
+    borderRadius: 8,
+    marginVertical: 4,
+    backgroundColor: theme.colors.background,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  selectedItem: {
+    backgroundColor: theme.colors.primary + '20',
+    borderColor: theme.colors.primary,
+  },
   avatar: {
     backgroundColor: theme.colors.primary,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+  },
+  specialty: {
+    fontSize: 14,
+    color: theme.colors.text,
+    opacity: 0.7,
   },
 };
 
 const Container = styled.View`
-  background-color: ${theme.colors.primary};
-  padding: 16px;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom-width: 1px;
-  border-bottom-color: ${theme.colors.border};
-`;
-const UserInfo = styled.View`
-  flex-direction: row;
-  align-items: center;
+  margin-bottom: 15px;
 `;
 
-const TextContainer = styled.View`
-  margin-left: 12px;
-`;
-
-const WelcomeText = styled.Text`
-  font-size: 14px;
-  color: ${theme.colors.white};
-  opacity: 0.9;
-`;
-
-const UserName = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  color: ${theme.colors.white};
-`;
-
-export default Header;
+export default DoctorList; 
