@@ -1,93 +1,156 @@
 import { ViewStyle } from 'react-native';
 import styled from 'styled-components/native';
-import theme from '../../styles/theme';
 
 export const styles = {
   scrollContent: {
     padding: 20,
-  },
-  button: {
-    marginBottom: 20,
-    width: '100%',
-  } as ViewStyle,
-  buttonStyle: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 12,
-  },
-  editButton: {
-    backgroundColor: theme.colors.success,
-    paddingVertical: 12,
-  },
-  logoutButton: {
-    backgroundColor: theme.colors.error,
-    paddingVertical: 12,
+    flexGrow: 1,
   },
 };
 
 export const Container = styled.View`
   flex: 1;
-  background-color: ${theme.colors.background};
+  background-color: ${props => props.theme.colors.background};
 `;
 
-export const ScrollView = styled.ScrollView`
-  flex: 1;
+export const Header = styled.View`
+  background-color: ${props => props.theme.colors.primary};
+  padding-horizontal: ${props => props.theme.spacing.lg}px;
+  padding-vertical: ${props => props.theme.spacing.lg}px;
+  padding-top: ${props => props.theme.spacing.xl}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 4;
 `;
 
-export const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 20px;
+export const HeaderTitle = styled.Text`
+  font-size: ${props => props.theme.typography.heading.fontSize}px;
+  font-weight: ${props => props.theme.typography.heading.fontWeight};
+  color: ${props => props.theme.colors.white};
+  text-align: center;
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+`;
+
+export const HeaderSubtitle = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.white};
+  opacity: 0.9;
   text-align: center;
 `;
 
 export const ProfileCard = styled.View`
-  background-color: ${theme.colors.background};
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  background-color: ${props => props.theme.colors.surface};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  margin-bottom: ${props => props.theme.spacing.lg}px;
   align-items: center;
-  border-width: 1px;
-  border-color: ${theme.colors.border};
+  border: 1px solid ${props => props.theme.colors.border};
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+export const ProfileImageContainer = styled.View`
+  margin-bottom: ${props => props.theme.spacing.md}px;
 `;
 
 export const Name = styled.Text`
-  font-size: 20px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 8px;
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  font-weight: ${props => props.theme.typography.subtitle.fontWeight};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+  text-align: center;
 `;
 
 export const Email = styled.Text`
-  font-size: 16px;
-  color: ${theme.colors.text};
-  margin-bottom: 8px;
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.textMuted};
+  margin-bottom: ${props => props.theme.spacing.md}px;
+  text-align: center;
 `;
 
 export const RoleBadge = styled.View<{ role: string }>`
-  background-color: ${(props) => {
+  flex-direction: row;
+  align-items: center;
+  background-color: ${props => {
     switch (props.role) {
       case 'admin':
-        return theme.colors.primary + '20';
+        return props.theme.colors.primary;
       case 'doctor':
-        return theme.colors.success + '20';
+        return props.theme.colors.success;
       default:
-        return theme.colors.secondary + '20';
+        return props.theme.colors.secondary;
     }
   }};
-  padding: 4px 12px;
-  border-radius: 4px;
-  margin-bottom: 8px;
+  padding: ${props => props.theme.spacing.sm}px ${props => props.theme.spacing.md}px;
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  margin-bottom: ${props => props.theme.spacing.md}px;
 `;
 
 export const RoleText = styled.Text`
-  color: ${theme.colors.text};
-  font-size: 14px;
-  font-weight: 500;
+  color: #fff;
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  margin-left: ${props => props.theme.spacing.xs}px;
 `;
 
 export const SpecialtyText = styled.Text`
-  font-size: 16px;
-  color: ${theme.colors.text};
-  margin-top: 8px;
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.text};
+  margin-top: ${props => props.theme.spacing.md}px;
+  text-align: center;
+  font-weight: 500;
+`;
+
+export const ButtonsContainer = styled.View`
+  gap: ${props => props.theme.spacing.md}px;
+`;
+
+export const EditButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.success};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+export const BackButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.surface};
+  border: 1px solid ${props => props.theme.colors.primary};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const LogoutButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.error};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+export const ButtonText = styled.Text<{ color?: string }>`
+  color: ${props => props.color || props.theme.colors.white};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  margin-left: ${props => props.theme.spacing.sm}px;
 `;
