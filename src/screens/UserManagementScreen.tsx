@@ -1,46 +1,32 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { ScrollView, ViewStyle, TextStyle } from 'react-native';
-import { Button, ListItem, Text } from 'react-native-elements';
+import { ScrollView, View, Text, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
-import theme from '../styles/theme';
-import Header from '../components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authService } from '../services/auth';
 
 type UserManagementScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'UserManagement'>;
 };
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'doctor' | 'patient';
-}
-
-interface StyledProps {
-  role: string;
-}
-
 const UserManagementScreen: React.FC = () => {
   const { user } = useAuth();
   const navigation = useNavigation<UserManagementScreenProps['navigation']>();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadUsers = async () => {
     try {
-      const storedUsers = await AsyncStorage.getItem('@MedicalApp:users');
-      if (storedUsers) {
-        const allUsers: User[] = JSON.parse(storedUsers);
-        // Filtra o usuário atual da lista
-        const filteredUsers = allUsers.filter(u => u.id !== user?.id);
-        setUsers(filteredUsers);
-      }
+      // Carrega todos os usuários do authService
+      const allUsers = await authService.getAllUsers();
+      // Filtra o usuário atual da lista
+      const filteredUsers = allUsers.filter(u => u.id !== user?.id);
+      setUsers(filteredUsers);
     } catch (error) {
       console.error('Erro ao carregar usuários:', error);
     } finally {
@@ -49,17 +35,8 @@ const UserManagementScreen: React.FC = () => {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    try {
-      const storedUsers = await AsyncStorage.getItem('@MedicalApp:users');
-      if (storedUsers) {
-        const allUsers: User[] = JSON.parse(storedUsers);
-        const updatedUsers = allUsers.filter(u => u.id !== userId);
-        await AsyncStorage.setItem('@MedicalApp:users', JSON.stringify(updatedUsers));
-        loadUsers(); // Recarrega a lista
-      }
-    } catch (error) {
-      console.error('Erro ao deletar usuário:', error);
-    }
+    // Implementação futura para deletar usuário
+    console.log('Deletar usuário:', userId);
   };
 
   // Carrega os usuários quando a tela estiver em foco
@@ -82,180 +59,339 @@ const UserManagementScreen: React.FC = () => {
     }
   };
 
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return props => props.theme.colors.primary;
+      case 'doctor':
+        return props => props.theme.colors.success;
+      case 'patient':
+        return props => props.theme.colors.secondary;
+      default:
+        return props => props.theme.colors.textMuted;
+    }
+  };
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'shield';
+      case 'doctor':
+        return 'medical';
+      case 'patient':
+        return 'person';
+      default:
+        return 'help';
+    }
+  };
+
+  const renderUserItem = ({ item }: { item: any }) => (
+    <UserCard>
+      <UserHeader>
+        <UserAvatar>
+          <Ionicons
+            name={getRoleIcon(item.role)}
+            size={24}
+            color="#fff"
+          />
+        </UserAvatar>
+        <UserInfo>
+          <UserName>{item.name}</UserName>
+          <UserEmail>{item.email}</UserEmail>
+        </UserInfo>
+        <RoleBadge role={item.role}>
+          <RoleText role={item.role}>
+            {getRoleText(item.role)}
+          </RoleText>
+        </RoleBadge>
+      </UserHeader>
+
+      <UserActions>
+        <ActionButton onPress={() => {}}>
+          <Ionicons name="create" size={16} color="#fff" />
+          <ActionText>Editar</ActionText>
+        </ActionButton>
+        <DeleteButton onPress={() => handleDeleteUser(item.id)}>
+          <Ionicons name="trash" size={16} color="#fff" />
+          <ActionText>Excluir</ActionText>
+        </DeleteButton>
+      </UserActions>
+    </UserCard>
+  );
+
   return (
     <Container>
-      <Header />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Title>Gerenciar Usuários</Title>
+      <Header>
+        <HeaderTitle>Gerenciar Usuários</HeaderTitle>
+        <HeaderSubtitle>Administre todos os usuários do sistema</HeaderSubtitle>
+      </Header>
 
-        <Button
-          title="Adicionar Novo Usuário"
-          onPress={() => {}}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.buttonStyle}
-        />
+      <Content>
+        <AddUserButton onPress={() => {}}>
+          <Ionicons name="add" size={24} color="#fff" />
+          <AddUserText>Adicionar Novo Usuário</AddUserText>
+        </AddUserButton>
 
         {loading ? (
-          <LoadingText>Carregando usuários...</LoadingText>
+          <LoadingContainer>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <LoadingText>Carregando usuários...</LoadingText>
+          </LoadingContainer>
         ) : users.length === 0 ? (
-          <EmptyText>Nenhum usuário cadastrado</EmptyText>
+          <EmptyContainer>
+            <Ionicons name="people" size={64} color={theme.colors.textMuted} />
+            <EmptyText>Nenhum usuário cadastrado</EmptyText>
+          </EmptyContainer>
         ) : (
-          users.map((user) => (
-            <UserCard key={user.id}>
-              <ListItem.Content>
-                <ListItem.Title style={styles.userName as TextStyle}>
-                  {user.name}
-                </ListItem.Title>
-                <ListItem.Subtitle style={styles.userEmail as TextStyle}>
-                  {user.email}
-                </ListItem.Subtitle>
-                <RoleBadge role={user.role}>
-                  <RoleText role={user.role}>
-                    {getRoleText(user.role)}
-                  </RoleText>
-                </RoleBadge>
-                <ButtonContainer>
-                  <Button
-                    title="Editar"
-                    onPress={() => {}}
-                    containerStyle={styles.actionButton as ViewStyle}
-                    buttonStyle={styles.editButton}
-                  />
-                  <Button
-                    title="Excluir"
-                    onPress={() => handleDeleteUser(user.id)}
-                    containerStyle={styles.actionButton as ViewStyle}
-                    buttonStyle={styles.deleteButton}
-                  />
-                </ButtonContainer>
-              </ListItem.Content>
-            </UserCard>
-          ))
+          <UserList
+            data={users}
+            renderItem={renderUserItem}
+            keyExtractor={item => item.id}
+            showsVerticalScrollIndicator={false}
+          />
         )}
 
-        <Button
-          title="Voltar"
-          onPress={() => navigation.goBack()}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.backButton}
-        />
-      </ScrollView>
+        <BackButton onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <BackText>Voltar</BackText>
+        </BackButton>
+      </Content>
     </Container>
   );
 };
 
-const styles = {
-  scrollContent: {
-    padding: 20,
-  },
-  button: {
-    marginBottom: 20,
-    width: '100%',
-  },
-  buttonStyle: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 12,
-  },
-  backButton: {
-    backgroundColor: theme.colors.secondary,
-    paddingVertical: 12,
-  },
-  actionButton: {
-    marginTop: 8,
-    width: '48%',
-  },
-  editButton: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 8,
-  },
-  deleteButton: {
-    backgroundColor: theme.colors.error,
-    paddingVertical: 8,
-  },
-  userName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.text,
-  },
-  userEmail: {
-    fontSize: 14,
-    color: theme.colors.text,
-    marginTop: 4,
-  },
-};
-
+// Componentes estilizados
 const Container = styled.View`
   flex: 1;
-  background-color: ${theme.colors.background};
+  background-color: ${props => props.theme.colors.background};
 `;
 
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 20px;
+const Header = styled.View`
+  background-color: ${props => props.theme.colors.primary};
+  padding-horizontal: ${props => props.theme.spacing.lg}px;
+  padding-vertical: ${props => props.theme.spacing.lg}px;
+  padding-top: ${props => props.theme.spacing.xl}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 4;
+`;
+
+const HeaderTitle = styled.Text`
+  font-size: ${props => props.theme.typography.heading.fontSize}px;
+  font-weight: ${props => props.theme.typography.heading.fontWeight};
+  color: ${props => props.theme.colors.white};
+  text-align: center;
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+`;
+
+const HeaderSubtitle = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.white};
+  opacity: 0.9;
   text-align: center;
 `;
 
-const UserCard = styled(ListItem)`
-  background-color: ${theme.colors.background};
-  border-radius: 8px;
-  margin-bottom: 10px;
-  padding: 15px;
-  border-width: 1px;
-  border-color: ${theme.colors.border};
+const Content = styled.View`
+  flex: 1;
+  padding: ${props => props.theme.spacing.lg}px;
+`;
+
+const AddUserButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.success};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${props => props.theme.spacing.xl}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+const AddUserText = styled.Text`
+  color: ${props => props.theme.colors.white};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  margin-left: ${props => props.theme.spacing.sm}px;
+`;
+
+const LoadingContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+  padding: ${props => props.theme.spacing.xl}px;
 `;
 
 const LoadingText = styled.Text`
-  text-align: center;
-  color: ${theme.colors.text};
-  font-size: 16px;
-  margin-top: 20px;
+  color: ${props => props.theme.colors.textMuted};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  margin-top: ${props => props.theme.spacing.md}px;
+`;
+
+const EmptyContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+  padding: ${props => props.theme.spacing.xl}px;
 `;
 
 const EmptyText = styled.Text`
-  text-align: center;
-  color: ${theme.colors.text};
-  font-size: 16px;
-  margin-top: 20px;
+  color: ${props => props.theme.colors.textMuted};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  margin-top: ${props => props.theme.spacing.md}px;
 `;
 
-const RoleBadge = styled.View<StyledProps>`
-  background-color: ${(props: StyledProps) => {
-    switch (props.role) {
-      case 'admin':
-        return theme.colors.primary + '20';
-      case 'doctor':
-        return theme.colors.success + '20';
-      default:
-        return theme.colors.secondary + '20';
-    }
-  }};
-  padding: 4px 8px;
-  border-radius: 4px;
-  align-self: flex-start;
-  margin-top: 8px;
+const UserList = styled.FlatList`
+  flex: 1;
 `;
 
-const RoleText = styled.Text<StyledProps>`
-  color: ${(props: StyledProps) => {
-    switch (props.role) {
-      case 'admin':
-        return theme.colors.primary;
-      case 'doctor':
-        return theme.colors.success;
-      default:
-        return theme.colors.secondary;
-    }
-  }};
-  font-size: 12px;
-  font-weight: 500;
+const UserCard = styled.View`
+  background-color: ${props => props.theme.colors.surface};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  margin-bottom: ${props => props.theme.spacing.md}px;
+  border: 1px solid ${props => props.theme.colors.border};
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
 `;
 
-const ButtonContainer = styled.View`
+const UserHeader = styled.View`
   flex-direction: row;
-  justify-content: space-between;
-  margin-top: 8px;
+  align-items: center;
+  margin-bottom: ${props => props.theme.spacing.md}px;
+`;
+
+const UserAvatar = styled.View<{ role: string }>`
+  width: 48px;
+  height: 48px;
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  background-color: ${props => {
+    switch (props.role) {
+      case 'admin':
+        return props.theme.colors.primary;
+      case 'doctor':
+        return props.theme.colors.success;
+      case 'patient':
+        return props.theme.colors.secondary;
+      default:
+        return props.theme.colors.textMuted;
+    }
+  }};
+  align-items: center;
+  justify-content: center;
+  margin-right: ${props => props.theme.spacing.md}px;
+`;
+
+const UserInfo = styled.View`
+  flex: 1;
+`;
+
+const UserName = styled.Text`
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  font-weight: ${props => props.theme.typography.subtitle.fontWeight};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+`;
+
+const UserEmail = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.textMuted};
+`;
+
+const RoleBadge = styled.View<{ role: string }>`
+  background-color: ${props => {
+    switch (props.role) {
+      case 'admin':
+        return props.theme.colors.primary + '20';
+      case 'doctor':
+        return props.theme.colors.success + '20';
+      case 'patient':
+        return props.theme.colors.secondary + '20';
+      default:
+        return props.theme.colors.textMuted + '20';
+    }
+  }};
+  padding: ${props => props.theme.spacing.xs}px ${props => props.theme.spacing.sm}px;
+  border-radius: ${props => props.theme.borderRadius.sm}px;
+  align-items: center;
+  justify-content: center;
+`;
+
+const RoleText = styled.Text<{ role: string }>`
+  font-size: ${props => props.theme.typography.small.fontSize}px;
+  font-weight: 600;
+  color: ${props => {
+    switch (props.role) {
+      case 'admin':
+        return props.theme.colors.primary;
+      case 'doctor':
+        return props.theme.colors.success;
+      case 'patient':
+        return props.theme.colors.secondary;
+      default:
+        return props.theme.colors.textMuted;
+    }
+  }};
+`;
+
+const UserActions = styled.View`
+  flex-direction: row;
+  gap: ${props => props.theme.spacing.sm}px;
+`;
+
+const ActionButton = styled.TouchableOpacity`
+  flex: 1;
+  background-color: ${props => props.theme.colors.primary};
+  border-radius: ${props => props.theme.borderRadius.md}px;
+  padding: ${props => props.theme.spacing.sm}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`;
+
+const DeleteButton = styled.TouchableOpacity`
+  flex: 1;
+  background-color: ${props => props.theme.colors.error};
+  border-radius: ${props => props.theme.borderRadius.md}px;
+  padding: ${props => props.theme.spacing.sm}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ActionText = styled.Text`
+  color: ${props => props.theme.colors.white};
+  font-size: ${props => props.theme.typography.small.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  margin-left: ${props => props.theme.spacing.xs}px;
+`;
+
+const BackButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.secondary};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: ${props => props.theme.spacing.xl}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+const BackText = styled.Text`
+  color: ${props => props.theme.colors.white};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  margin-left: ${props => props.theme.spacing.sm}px;
 `;
 
 export default UserManagementScreen; 

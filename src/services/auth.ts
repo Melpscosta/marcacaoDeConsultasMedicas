@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, LoginCredentials, RegisterData, AuthResponse } from '../types/auth';
+import { getProfileImage } from './profileImages';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
@@ -16,7 +17,7 @@ const mockDoctors = [
     email: 'joao@example.com',
     role: 'doctor' as const,
     specialty: 'Cardiologia',
-    image: 'https://randomuser.me/api/portraits/men/1.jpg',
+    image: getProfileImage('João Silva', 'doctor'),
   },
   {
     id: '2',
@@ -24,7 +25,7 @@ const mockDoctors = [
     email: 'maria@example.com',
     role: 'doctor' as const,
     specialty: 'Pediatria',
-    image: 'https://randomuser.me/api/portraits/women/1.jpg',
+    image: getProfileImage('Maria Santos', 'doctor'),
   },
   {
     id: '3',
@@ -32,7 +33,23 @@ const mockDoctors = [
     email: 'pedro@example.com',
     role: 'doctor' as const,
     specialty: 'Ortopedia',
-    image: 'https://randomuser.me/api/portraits/men/2.jpg',
+    image: getProfileImage('Pedro Oliveira', 'doctor'),
+  },
+  {
+    id: '4',
+    name: 'Dra. Ana Costa',
+    email: 'ana.doctor@example.com',
+    role: 'doctor' as const,
+    specialty: 'Dermatologia',
+    image: getProfileImage('Ana Costa', 'doctor'),
+  },
+  {
+    id: '5',
+    name: 'Dr. Carlos Mendes',
+    email: 'carlos.doctor@example.com',
+    role: 'doctor' as const,
+    specialty: 'Clínico Geral',
+    image: getProfileImage('Carlos Mendes', 'doctor'),
   },
 ];
 
@@ -42,11 +59,53 @@ const mockAdmin = {
   name: 'Administrador',
   email: 'admin@example.com',
   role: 'admin' as const,
-  image: 'https://randomuser.me/api/portraits/men/3.jpg',
+  image: getProfileImage('Administrador', 'user'),
 };
 
 // Lista de usuários cadastrados (pacientes)
-let registeredUsers: (User & { password: string })[] = [];
+let registeredUsers: (User & { password: string })[] = [
+  // Pacientes de exemplo para testes
+  {
+    id: 'patient-example-1',
+    name: 'Ana Paciente',
+    email: 'ana@exemplo.com',
+    role: 'patient' as const,
+    image: getProfileImage('Ana Paciente', 'patient'),
+    password: '123456',
+  },
+  {
+    id: 'patient-example-2',
+    name: 'Carlos Paciente',
+    email: 'carlos@exemplo.com',
+    role: 'patient' as const,
+    image: getProfileImage('Carlos Paciente', 'patient'),
+    password: '123456',
+  },
+  {
+    id: 'patient-example-3',
+    name: 'Maria Paciente',
+    email: 'maria@exemplo.com',
+    role: 'patient' as const,
+    image: getProfileImage('Maria Paciente', 'patient'),
+    password: '123456',
+  },
+  {
+    id: 'patient-test-1',
+    name: 'João Teste',
+    email: 'teste@paciente.com',
+    role: 'patient' as const,
+    image: getProfileImage('João Teste', 'patient'),
+    password: '123456',
+  },
+  {
+    id: 'patient-test-2',
+    name: 'Pedro Usuário',
+    email: 'pedro@usuario.com',
+    role: 'patient' as const,
+    image: getProfileImage('Pedro Usuário', 'patient'),
+    password: '123456',
+  }
+];
 
 export const authService = {
   async signIn(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -100,13 +159,11 @@ export const authService = {
 
     // Cria um novo paciente
     const newPatient: User & { password: string } = {
-      id: `patient-${registeredUsers.length + 1}`,
+      id: `patient-${registeredUsers.length + 4}`,
       name: data.name,
       email: data.email,
       role: 'patient' as const,
-      image: `https://randomuser.me/api/portraits/${registeredUsers.length % 2 === 0 ? 'men' : 'women'}/${
-        registeredUsers.length + 1
-      }.jpg`,
+      image: getProfileImage(data.name, 'patient'),
       password: data.password,
     };
 
