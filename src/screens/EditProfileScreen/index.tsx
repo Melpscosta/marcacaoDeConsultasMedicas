@@ -147,7 +147,7 @@ const EditProfileScreen: React.FC = () => {
           <InputContainer>
             <InputLabel>
               <Ionicons name="person" size={16} color="#0066CC" />
-              <InputLabelText>Nome Completo</InputLabel>
+              <InputLabelText>Nome Completo</InputLabelText>
             </InputLabel>
             <StyledInput
               value={name}
@@ -160,7 +160,7 @@ const EditProfileScreen: React.FC = () => {
           <InputContainer>
             <InputLabel>
               <Ionicons name="mail" size={16} color="#0066CC" />
-              <InputLabelText>Email</InputLabel>
+              <InputLabelText>Email</InputLabelText>
             </InputLabel>
             <StyledInput
               value={email}
@@ -176,7 +176,7 @@ const EditProfileScreen: React.FC = () => {
             <InputContainer>
               <InputLabel>
                 <Ionicons name="medical" size={16} color="#0066CC" />
-                <InputLabelText>Especialidade</InputLabel>
+                <InputLabelText>Especialidade</InputLabelText>
               </InputLabel>
               <StyledInput
                 value={specialty}

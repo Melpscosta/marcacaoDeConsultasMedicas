@@ -133,7 +133,7 @@ const CreateAppointmentScreen: React.FC = () => {
           <InputContainer>
             <InputLabel>
               <Ionicons name="calendar" size={16} color="#0066CC" />
-              <InputLabelText>Data da Consulta</InputLabel>
+              <InputLabelText>Data da Consulta</InputLabelText>
             </InputLabel>
             <DateInput
               placeholder="DD/MM/AAAA"
