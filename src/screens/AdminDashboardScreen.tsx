@@ -346,6 +346,7 @@ const StatisticsGrid = styled.View`
 const StatisticsCard = styled.View`
   flex: 1;
   min-width: 45%;
+  max-width: 48%;
   background-color: ${props => props.theme.colors.surface};
   border-radius: ${props => props.theme.borderRadius.lg}px;
   padding: ${props => props.theme.spacing.lg}px;
@@ -355,6 +356,7 @@ const StatisticsCard = styled.View`
   shadow-radius: 4px;
   elevation: 3;
   border: 1px solid ${props => props.theme.colors.border};
+  overflow: hidden;
 `;
 
 const StatisticsIcon = styled.View<{ background: string }>`
@@ -365,10 +367,13 @@ const StatisticsIcon = styled.View<{ background: string }>`
   align-items: center;
   justify-content: center;
   margin-bottom: ${props => props.theme.spacing.md}px;
+  align-self: flex-start;
 `;
 
 const StatisticsContent = styled.View`
   flex: 1;
+  width: 100%;
+  align-items: flex-start;
 `;
 
 const StatisticsValue = styled.Text`
@@ -376,6 +381,8 @@ const StatisticsValue = styled.Text`
   font-weight: ${props => props.theme.typography.heading.fontWeight};
   color: ${props => props.theme.colors.text};
   margin-bottom: ${props => props.theme.spacing.xs}px;
+  width: 100%;
+  flex-wrap: wrap;
 `;
 
 const StatisticsLabel = styled.Text`
@@ -383,11 +390,15 @@ const StatisticsLabel = styled.Text`
   font-weight: ${props => props.theme.typography.body.fontWeight};
   color: ${props => props.theme.colors.text};
   margin-bottom: ${props => props.theme.spacing.xs}px;
+  width: 100%;
+  flex-wrap: wrap;
 `;
 
 const StatisticsSubtitle = styled.Text`
   font-size: ${props => props.theme.typography.small.fontSize}px;
   color: ${props => props.theme.colors.textMuted};
+  width: 100%;
+  flex-wrap: wrap;
 `;
 
 // Especialidades
