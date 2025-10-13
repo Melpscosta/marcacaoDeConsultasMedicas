@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { ScrollView, ViewStyle, TextStyle } from 'react-native';
-import { Button, ListItem, Text } from 'react-native-elements';
+import { ScrollView, View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
-import theme from '../styles/theme';
-import Header from '../components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import StatisticsCard from '../components/StatisticsCard';
 import { statisticsService, Statistics } from '../services/statistics';
+import { StatusBadge } from '../components/FeedbackMessages';
+import theme from '../styles/theme';
 
 type AdminDashboardScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AdminDashboard'>;
@@ -35,32 +34,6 @@ interface User {
   role: 'admin' | 'doctor' | 'patient';
 }
 
-interface StyledProps {
-  status: string;
-}
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'confirmed':
-      return theme.colors.success;
-    case 'cancelled':
-      return theme.colors.error;
-    default:
-      return theme.colors.warning;
-  }
-};
-
-const getStatusText = (status: string) => {
-  switch (status) {
-    case 'confirmed':
-      return 'Confirmada';
-    case 'cancelled':
-      return 'Cancelada';
-    default:
-      return 'Pendente';
-  }
-};
-
 const AdminDashboardScreen: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigation = useNavigation<AdminDashboardScreenProps['navigation']>();
@@ -68,6 +41,19 @@ const AdminDashboardScreen: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [statistics, setStatistics] = useState<Statistics | null>(null);
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'confirmed':
+        return 'Confirmado';
+      case 'pending':
+        return 'Pendente';
+      case 'cancelled':
+        return 'Cancelado';
+      default:
+        return status;
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -122,51 +108,74 @@ const AdminDashboardScreen: React.FC = () => {
 
   return (
     <Container>
-      <Header />
+      <Header>
+        <HeaderTitle>Painel Administrativo</HeaderTitle>
+        <HeaderSubtitle>Bem-vindo(a), {user?.name}</HeaderSubtitle>
+      </Header>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Title>Painel Administrativo</Title>
 
-        <Button
-          title="Gerenciar Usuários"
-          onPress={() => navigation.navigate('UserManagement')}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.buttonStyle}
-        />
+        <ActionsContainer>
+          <ActionButton
+            onPress={() => navigation.navigate('UserManagement')}
+          >
+            <Ionicons name="people" size={24} color={theme.colors.white} />
+            <ActionText>Gerenciar Usuários</ActionText>
+          </ActionButton>
 
-        <Button
-          title="Meu Perfil"
-          onPress={() => navigation.navigate('Profile')}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.buttonStyle}
-        />
+          <ActionButton
+            onPress={() => navigation.navigate('Profile')}
+          >
+            <Ionicons name="person" size={24} color={theme.colors.white} />
+            <ActionText>Meu Perfil</ActionText>
+          </ActionButton>
+        </ActionsContainer>
 
         <SectionTitle>Estatísticas Gerais</SectionTitle>
         {statistics && (
           <StatisticsGrid>
-            <StatisticsCard
-              title="Total de Consultas"
-              value={statistics.totalAppointments}
-              color={theme.colors.primary}
-              subtitle="Todas as consultas"
-            />
-            <StatisticsCard
-              title="Consultas Confirmadas"
-              value={statistics.confirmedAppointments}
-              color={theme.colors.success}
-              subtitle={`${statistics.statusPercentages.confirmed.toFixed(1)}% do total`}
-            />
-            <StatisticsCard
-              title="Pacientes Ativos"
-              value={statistics.totalPatients}
-              color={theme.colors.secondary}
-              subtitle="Pacientes únicos"
-            />
-            <StatisticsCard
-              title="Médicos Ativos"
-              value={statistics.totalDoctors}
-              color={theme.colors.warning}
-              subtitle="Médicos com consultas"
-            />
+            <StatisticsCard>
+              <StatisticsIcon background={theme.colors.primaryLight}>
+                <Ionicons name="calendar" size={24} color={theme.colors.primary} />
+              </StatisticsIcon>
+              <StatisticsContent>
+                <StatisticsValue>{statistics.totalAppointments}</StatisticsValue>
+                <StatisticsLabel>Total de Consultas</StatisticsLabel>
+                <StatisticsSubtitle>Todas as consultas</StatisticsSubtitle>
+              </StatisticsContent>
+            </StatisticsCard>
+
+            <StatisticsCard>
+              <StatisticsIcon background={theme.colors.successLight}>
+                <Ionicons name="checkmark-circle" size={24} color={theme.colors.success} />
+              </StatisticsIcon>
+              <StatisticsContent>
+                <StatisticsValue>{statistics.confirmedAppointments}</StatisticsValue>
+                <StatisticsLabel>Confirmadas</StatisticsLabel>
+                <StatisticsSubtitle>{`${statistics.statusPercentages.confirmed.toFixed(1)}% do total`}</StatisticsSubtitle>
+              </StatisticsContent>
+            </StatisticsCard>
+
+            <StatisticsCard>
+              <StatisticsIcon background={theme.colors.secondaryLight}>
+                <Ionicons name="people" size={24} color={theme.colors.secondary} />
+              </StatisticsIcon>
+              <StatisticsContent>
+                <StatisticsValue>{statistics.totalPatients}</StatisticsValue>
+                <StatisticsLabel>Pacientes Ativos</StatisticsLabel>
+                <StatisticsSubtitle>Pacientes únicos</StatisticsSubtitle>
+              </StatisticsContent>
+            </StatisticsCard>
+
+            <StatisticsCard>
+              <StatisticsIcon background={theme.colors.warningLight}>
+                <Ionicons name="medical" size={24} color={theme.colors.warning} />
+              </StatisticsIcon>
+              <StatisticsContent>
+                <StatisticsValue>{statistics.totalDoctors}</StatisticsValue>
+                <StatisticsLabel>Médicos Ativos</StatisticsLabel>
+                <StatisticsSubtitle>Médicos com consultas</StatisticsSubtitle>
+              </StatisticsContent>
+            </StatisticsCard>
           </StatisticsGrid>
         )}
 
@@ -178,8 +187,13 @@ const AdminDashboardScreen: React.FC = () => {
               .slice(0, 3)
               .map(([specialty, count]) => (
                 <SpecialtyItem key={specialty}>
-                  <SpecialtyName>{specialty}</SpecialtyName>
-                  <SpecialtyCount>{count} consultas</SpecialtyCount>
+                  <SpecialtyInfo>
+                    <SpecialtyName>{specialty}</SpecialtyName>
+                    <SpecialtyCount>{count} consultas</SpecialtyCount>
+                  </SpecialtyInfo>
+                  <SpecialtyIcon>
+                    <Ionicons name="chevron-forward" size={20} color={theme.colors.textMuted} />
+                  </SpecialtyIcon>
                 </SpecialtyItem>
               ))
             }
@@ -188,54 +202,57 @@ const AdminDashboardScreen: React.FC = () => {
 
         <SectionTitle>Últimas Consultas</SectionTitle>
         {loading ? (
-          <LoadingText>Carregando dados...</LoadingText>
+          <LoadingContainer>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <LoadingText>Carregando dados...</LoadingText>
+          </LoadingContainer>
         ) : appointments.length === 0 ? (
-          <EmptyText>Nenhuma consulta agendada</EmptyText>
+          <EmptyContainer>
+            <Ionicons name="calendar-outline" size={64} color={theme.colors.textMuted} />
+            <EmptyText>Nenhuma consulta agendada</EmptyText>
+          </EmptyContainer>
         ) : (
           appointments.map((appointment) => (
             <AppointmentCard key={appointment.id}>
-              <ListItem.Content>
-                <ListItem.Title style={styles.doctorName as TextStyle}>
-                  {appointment.doctorName}
-                </ListItem.Title>
-                <ListItem.Subtitle style={styles.specialty as TextStyle}>
-                  {appointment.specialty}
-                </ListItem.Subtitle>
-                <Text style={styles.dateTime as TextStyle}>
-                  {appointment.date} às {appointment.time}
-                </Text>
-                <StatusBadge status={appointment.status}>
-                  <StatusText status={appointment.status}>
-                    {getStatusText(appointment.status)}
-                  </StatusText>
-                </StatusBadge>
-                {appointment.status === 'pending' && (
-                  <ButtonContainer>
-                    <Button
-                      title="Confirmar"
-                      onPress={() => handleUpdateStatus(appointment.id, 'confirmed')}
-                      containerStyle={styles.actionButton as ViewStyle}
-                      buttonStyle={styles.confirmButton}
-                    />
-                    <Button
-                      title="Cancelar"
-                      onPress={() => handleUpdateStatus(appointment.id, 'cancelled')}
-                      containerStyle={styles.actionButton as ViewStyle}
-                      buttonStyle={styles.cancelButton}
-                    />
-                  </ButtonContainer>
-                )}
-              </ListItem.Content>
+              <AppointmentHeader>
+                <DoctorInfo>
+                  <DoctorName>{appointment.doctorName}</DoctorName>
+                  <DoctorSpecialty>{appointment.specialty}</DoctorSpecialty>
+                </DoctorInfo>
+                <StatusBadge status={appointment.status} />
+              </AppointmentHeader>
+
+              <AppointmentDetails>
+                <DetailRow>
+                  <Ionicons name="calendar" size={16} color={theme.colors.textMuted} />
+                  <DetailText>{appointment.date}</DetailText>
+                </DetailRow>
+                <DetailRow>
+                  <Ionicons name="clock" size={16} color={theme.colors.textMuted} />
+                  <DetailText>{appointment.time}</DetailText>
+                </DetailRow>
+              </AppointmentDetails>
+
+              {appointment.status === 'pending' && (
+                <ActionButtonsContainer>
+                  <ConfirmButton onPress={() => handleUpdateStatus(appointment.id, 'confirmed')}>
+                    <Ionicons name="checkmark" size={16} color={theme.colors.white} />
+                    <ButtonText>Confirmar</ButtonText>
+                  </ConfirmButton>
+                  <CancelButton onPress={() => handleUpdateStatus(appointment.id, 'cancelled')}>
+                    <Ionicons name="close" size={16} color={theme.colors.white} />
+                    <ButtonText>Cancelar</ButtonText>
+                  </CancelButton>
+                </ActionButtonsContainer>
+              )}
             </AppointmentCard>
           ))
         )}
 
-        <Button
-          title="Sair"
-          onPress={signOut}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.logoutButton}
-        />
+        <LogoutButton onPress={signOut}>
+          <Ionicons name="log-out" size={24} color={theme.colors.white} />
+          <LogoutText>Sair</LogoutText>
+        </LogoutButton>
       </ScrollView>
     </Container>
   );
@@ -243,148 +260,317 @@ const AdminDashboardScreen: React.FC = () => {
 
 const styles = {
   scrollContent: {
-    padding: 20,
-  },
-  button: {
-    marginBottom: 20,
-    width: '100%',
-  },
-  buttonStyle: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 12,
-  },
-  logoutButton: {
-    backgroundColor: theme.colors.error,
-    paddingVertical: 12,
-  },
-  actionButton: {
-    marginTop: 8,
-    width: '48%',
-  },
-  confirmButton: {
-    backgroundColor: theme.colors.success,
-    paddingVertical: 8,
-  },
-  cancelButton: {
-    backgroundColor: theme.colors.error,
-    paddingVertical: 8,
-  },
-  doctorName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.text,
-  },
-  specialty: {
-    fontSize: 14,
-    color: theme.colors.text,
-    marginTop: 4,
-  },
-  dateTime: {
-    fontSize: 14,
-    color: theme.colors.text,
-    marginTop: 4,
+    padding: theme.spacing.lg,
   },
 };
 
+// Container principal
 const Container = styled.View`
   flex: 1;
-  background-color: ${theme.colors.background};
+  background-color: ${props => props.theme.colors.background};
 `;
 
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 20px;
+// Header
+const Header = styled.View`
+  background-color: ${props => props.theme.colors.primary};
+  padding-horizontal: ${props => props.theme.spacing.lg}px;
+  padding-vertical: ${props => props.theme.spacing.lg}px;
+  padding-top: ${props => props.theme.spacing.xl}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 4;
+`;
+
+const HeaderTitle = styled.Text`
+  font-size: ${props => props.theme.typography.heading.fontSize}px;
+  font-weight: ${props => props.theme.typography.heading.fontWeight};
+  color: ${props => props.theme.colors.white};
+  text-align: center;
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+`;
+
+const HeaderSubtitle = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.white};
+  opacity: 0.9;
   text-align: center;
 `;
 
-const SectionTitle = styled.Text`
-  font-size: 20px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 15px;
-  margin-top: 10px;
-`;
-
-const AppointmentCard = styled(ListItem)`
-  background-color: ${theme.colors.background};
-  border-radius: 8px;
-  margin-bottom: 10px;
-  padding: 15px;
-  border-width: 1px;
-  border-color: ${theme.colors.border};
-`;
-
-const LoadingText = styled.Text`
-  text-align: center;
-  color: ${theme.colors.text};
-  font-size: 16px;
-  margin-top: 20px;
-`;
-
-const EmptyText = styled.Text`
-  text-align: center;
-  color: ${theme.colors.text};
-  font-size: 16px;
-  margin-top: 20px;
-`;
-
-const StatusBadge = styled.View<StyledProps>`
-  background-color: ${(props: StyledProps) => getStatusColor(props.status) + '20'};
-  padding: 4px 8px;
-  border-radius: 4px;
-  align-self: flex-start;
-  margin-top: 8px;
-`;
-
-const StatusText = styled.Text<StyledProps>`
-  color: ${(props: StyledProps) => getStatusColor(props.status)};
-  font-size: 12px;
-  font-weight: 500;
-`;
-
-const ButtonContainer = styled.View`
+// Ações principais
+const ActionsContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  margin-top: 8px;
+  margin-bottom: ${props => props.theme.spacing.xl}px;
+  gap: ${props => props.theme.spacing.md}px;
+`;
+
+const ActionButton = styled.TouchableOpacity`
+  flex: 1;
+  background-color: ${props => props.theme.colors.primary};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  align-items: center;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+const ActionText = styled.Text`
+  color: ${props => props.theme.colors.white};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  margin-top: ${props => props.theme.spacing.sm}px;
+`;
+
+// Seção de estatísticas
+const SectionTitle = styled.Text`
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  font-weight: ${props => props.theme.typography.subtitle.fontWeight};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.lg}px;
+  margin-top: ${props => props.theme.spacing.lg}px;
 `;
 
 const StatisticsGrid = styled.View`
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: ${props => props.theme.spacing.xl}px;
+  gap: ${props => props.theme.spacing.md}px;
 `;
 
+const StatisticsCard = styled.View`
+  flex: 1;
+  min-width: 45%;
+  background-color: ${props => props.theme.colors.surface};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+  border: 1px solid ${props => props.theme.colors.border};
+`;
+
+const StatisticsIcon = styled.View<{ background: string }>`
+  width: 48px;
+  height: 48px;
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  background-color: ${props => props.background};
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${props => props.theme.spacing.md}px;
+`;
+
+const StatisticsContent = styled.View`
+  flex: 1;
+`;
+
+const StatisticsValue = styled.Text`
+  font-size: ${props => props.theme.typography.heading.fontSize}px;
+  font-weight: ${props => props.theme.typography.heading.fontWeight};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+`;
+
+const StatisticsLabel = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+`;
+
+const StatisticsSubtitle = styled.Text`
+  font-size: ${props => props.theme.typography.small.fontSize}px;
+  color: ${props => props.theme.colors.textMuted};
+`;
+
+// Especialidades
 const SpecialtyContainer = styled.View`
-  background-color: ${theme.colors.white};
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
-  border-width: 1px;
-  border-color: ${theme.colors.border};
+  background-color: ${props => props.theme.colors.surface};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  margin-bottom: ${props => props.theme.spacing.xl}px;
+  border: 1px solid ${props => props.theme.colors.border};
 `;
 
 const SpecialtyItem = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: ${props => props.theme.spacing.md}px 0;
   border-bottom-width: 1px;
-  border-bottom-color: ${theme.colors.border}20;
+  border-bottom-color: ${props => props.theme.colors.border}20;
+
+  &:last-child {
+    border-bottom-width: 0;
+  }
+`;
+
+const SpecialtyInfo = styled.View`
+  flex: 1;
 `;
 
 const SpecialtyName = styled.Text`
-  font-size: 16px;
-  font-weight: 500;
-  color: ${theme.colors.text};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.xs}px;
 `;
 
 const SpecialtyCount = styled.Text`
-  font-size: 14px;
-  color: ${theme.colors.primary};
+  font-size: ${props => props.theme.typography.small.fontSize}px;
+  color: ${props => props.theme.colors.primary};
   font-weight: 600;
+`;
+
+const SpecialtyIcon = styled.View``;
+
+// Consultas
+const LoadingContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+  padding: ${props => props.theme.spacing.xl}px;
+`;
+
+const LoadingText = styled.Text`
+  color: ${props => props.theme.colors.textMuted};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  margin-top: ${props => props.theme.spacing.md}px;
+`;
+
+const EmptyContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+  padding: ${props => props.theme.spacing.xl}px;
+`;
+
+const EmptyText = styled.Text`
+  color: ${props => props.theme.colors.textMuted};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  margin-top: ${props => props.theme.spacing.md}px;
+`;
+
+const AppointmentCard = styled.View`
+  background-color: ${props => props.theme.colors.surface};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  margin-bottom: ${props => props.theme.spacing.md}px;
+  border: 1px solid ${props => props.theme.colors.border};
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+const AppointmentHeader = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: ${props => props.theme.spacing.md}px;
+`;
+
+const DoctorInfo = styled.View`
+  flex: 1;
+  margin-right: ${props => props.theme.spacing.md}px;
+`;
+
+const DoctorName = styled.Text`
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  font-weight: ${props => props.theme.typography.subtitle.fontWeight};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+`;
+
+const DoctorSpecialty = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.textMuted};
+`;
+
+const AppointmentDetails = styled.View`
+  background-color: ${props => props.theme.colors.background};
+  border-radius: ${props => props.theme.borderRadius.md}px;
+  padding: ${props => props.theme.spacing.md}px;
+  margin-bottom: ${props => props.theme.spacing.md}px;
+`;
+
+const DetailRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: ${props => props.theme.spacing.sm}px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const DetailText = styled.Text`
+  flex: 1;
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.text};
+  margin-left: ${props => props.theme.spacing.sm}px;
+`;
+
+const ActionButtonsContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  gap: ${props => props.theme.spacing.sm}px;
+`;
+
+const ConfirmButton = styled.TouchableOpacity`
+  flex: 1;
+  background-color: ${props => props.theme.colors.success};
+  border-radius: ${props => props.theme.borderRadius.md}px;
+  padding: ${props => props.theme.spacing.sm}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`;
+
+const CancelButton = styled.TouchableOpacity`
+  flex: 1;
+  background-color: ${props => props.theme.colors.error};
+  border-radius: ${props => props.theme.borderRadius.md}px;
+  padding: ${props => props.theme.spacing.sm}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ButtonText = styled.Text`
+  color: ${props => props.theme.colors.white};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  margin-left: ${props => props.theme.spacing.xs}px;
+`;
+
+// Botão de logout
+const LogoutButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.error};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: ${props => props.theme.spacing.xl}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+const LogoutText = styled.Text`
+  color: ${props => props.theme.colors.white};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  margin-left: ${props => props.theme.spacing.sm}px;
 `;
 
 export default AdminDashboardScreen; 
