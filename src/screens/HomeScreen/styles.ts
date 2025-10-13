@@ -49,7 +49,7 @@ export const AppointmentCard = styled.View`
   border-radius: ${props => props.theme.borderRadius.lg}px;
   padding: ${props => props.theme.spacing.lg}px;
   margin-bottom: ${props => props.theme.spacing.md}px;
-  ${props => props.theme.shadows.md};
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid ${props => props.theme.colors.border};
 `;
 

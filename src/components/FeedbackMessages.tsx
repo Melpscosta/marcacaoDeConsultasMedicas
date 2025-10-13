@@ -223,7 +223,7 @@ const LoadingContainer = styled.View`
   border-radius: ${props => props.theme.borderRadius.lg}px;
   align-items: center;
   shadow-color: ${props => props.theme.colors.text};
-  shadow-offset: { width: 0, height: 2 };
+  shadow-offset: 0px 2px;
   shadow-opacity: 0.25;
   shadow-radius: 4px;
   elevation: 5;
@@ -259,7 +259,7 @@ const ToastContainer = styled.View<{ type: string }>`
     }
   }};
   shadow-color: ${props => props.theme.colors.text};
-  shadow-offset: { width: 0, height: 2 };
+  shadow-offset: 0px 2px;
   shadow-opacity: 0.25;
   shadow-radius: 4px;
   elevation: 5;

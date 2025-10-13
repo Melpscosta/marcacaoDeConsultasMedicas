@@ -25,7 +25,7 @@ const ButtonContainer = styled.TouchableOpacity`
   border-radius: ${props => props.theme.borderRadius.lg}px;
   margin-bottom: ${props => props.theme.spacing.lg}px;
   shadow-color: ${props => props.theme.colors.primary};
-  shadow-offset: { width: 0, height: 2 };
+  shadow-offset: 0px 2px;
   shadow-opacity: 0.3;
   shadow-radius: 4px;
   elevation: 4;

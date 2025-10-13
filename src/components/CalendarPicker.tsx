@@ -149,7 +149,7 @@ const CalendarContainer = styled.View`
   border-radius: ${props => props.theme.borderRadius.lg}px;
   padding: ${props => props.theme.spacing.lg}px;
   shadow-color: ${props => props.theme.colors.text};
-  shadow-offset: { width: 0, height: 2 };
+  shadow-offset: 0px 2px;
   shadow-opacity: 0.1;
   shadow-radius: 4px;
   elevation: 4;

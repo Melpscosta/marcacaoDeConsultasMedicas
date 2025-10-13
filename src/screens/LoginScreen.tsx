@@ -226,15 +226,15 @@ const styles = {
 
 const Container = styled.View`
   flex: 1;
-  background-color: ${theme.colors.background};
+  background-color: ${props => props.theme.colors.background};
 `;
 
 const HeaderContainer = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
-  padding-horizontal: ${theme.spacing.xl}px;
-  padding-top: ${theme.spacing.xxl}px;
+  padding-horizontal: ${props => props.theme.spacing.xl}px;
+  padding-top: ${props => props.theme.spacing.xxl}px;
 `;
 
 const LogoContainer = styled.View`
@@ -246,7 +246,7 @@ const LogoContainer = styled.View`
   align-items: center;
   margin-bottom: ${props => props.theme.spacing.lg}px;
   shadow-color: ${props => props.theme.colors.primary};
-  shadow-offset: { width: 0, height: 4 };
+  shadow-offset: 0px 4px;
   shadow-opacity: 0.3;
   shadow-radius: 8px;
   elevation: 8;
@@ -275,7 +275,7 @@ const FormContainer = styled.View`
   padding-horizontal: ${props => props.theme.spacing.xl}px;
   padding-top: ${props => props.theme.spacing.xxl}px;
   shadow-color: ${props => props.theme.colors.text};
-  shadow-offset: { width: 0, height: -2 };
+  shadow-offset: 0px -2px;
   shadow-opacity: 0.1;
   shadow-radius: 8px;
   elevation: 10;
@@ -340,7 +340,7 @@ const LoginButton = styled.TouchableOpacity`
   align-items: center;
   margin-bottom: ${props => props.theme.spacing.lg}px;
   shadow-color: ${props => props.theme.colors.primary};
-  shadow-offset: { width: 0, height: 2 };
+  shadow-offset: 0px 2px;
   shadow-opacity: 0.3;
   shadow-radius: 4px;
   elevation: 4;
