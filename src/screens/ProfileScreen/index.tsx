@@ -1,22 +1,28 @@
 import React from 'react';
-import { Button } from 'react-native-elements';
+import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/navigation';
-import Header from '../../components/Header';
 import ProfileImagePicker from '../../components/ProfileImagePicker';
-import { ViewStyle } from 'react-native';
 import {
   Container,
-  ScrollView,
-  Title,
+  Header,
+  HeaderTitle,
+  HeaderSubtitle,
   ProfileCard,
+  ProfileImageContainer,
   Name,
   Email,
   RoleBadge,
   RoleText,
   SpecialtyText,
+  ButtonsContainer,
+  EditButton,
+  BackButton,
+  LogoutButton,
+  ButtonText,
   styles
 } from './styles';
 
@@ -41,22 +47,58 @@ const ProfileScreen: React.FC = () => {
     }
   };
 
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return props => props.theme.colors.primary;
+      case 'doctor':
+        return props => props.theme.colors.success;
+      case 'patient':
+        return props => props.theme.colors.secondary;
+      default:
+        return props => props.theme.colors.textMuted;
+    }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Confirmar Saída',
+      'Tem certeza que deseja sair do aplicativo?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Sair', style: 'destructive', onPress: signOut }
+      ]
+    );
+  };
+
   return (
     <Container>
-      <Header />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Title>Meu Perfil</Title>
+      <Header>
+        <HeaderTitle>Meu Perfil</HeaderTitle>
+        <HeaderSubtitle>Gerencie suas informações pessoais</HeaderSubtitle>
+      </Header>
 
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <ProfileCard>
-          <ProfileImagePicker
-            currentImageUri={user?.image}
-            onImageSelected={() => {}} // Read-only na tela de perfil
-            size={120}
-            editable={false}
-          />
+          <ProfileImageContainer>
+            <ProfileImagePicker
+              currentImageUri={user?.image}
+              onImageSelected={() => {}} // Read-only na tela de perfil
+              size={120}
+              editable={false}
+            />
+          </ProfileImageContainer>
           <Name>{user?.name}</Name>
           <Email>{user?.email}</Email>
           <RoleBadge role={user?.role || ''}>
+            <Ionicons
+              name={
+                user?.role === 'admin' ? 'shield' :
+                user?.role === 'doctor' ? 'medical' : 'person'
+              }
+              size={16}
+              color="#fff"
+            />
             <RoleText>{getRoleText(user?.role || '')}</RoleText>
           </RoleBadge>
 
@@ -65,26 +107,22 @@ const ProfileScreen: React.FC = () => {
           )}
         </ProfileCard>
 
-        <Button
-          title="Editar Perfil"
-          onPress={() => navigation.navigate('EditProfile' as any)}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.editButton}
-        />
+        <ButtonsContainer>
+          <EditButton onPress={() => navigation.navigate('EditProfile' as any)}>
+            <Ionicons name="create" size={20} color="#fff" />
+            <ButtonText>Editar Perfil</ButtonText>
+          </EditButton>
 
-        <Button
-          title="Voltar"
-          onPress={() => navigation.goBack()}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.buttonStyle}
-        />
+          <BackButton onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={20} color="#0066CC" />
+            <ButtonText>Voltar</ButtonText>
+          </BackButton>
 
-        <Button
-          title="Sair"
-          onPress={signOut}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.logoutButton}
-        />
+          <LogoutButton onPress={handleLogout}>
+            <Ionicons name="log-out" size={20} color="#fff" />
+            <ButtonText>Sair</ButtonText>
+          </LogoutButton>
+        </ButtonsContainer>
       </ScrollView>
     </Container>
   );
