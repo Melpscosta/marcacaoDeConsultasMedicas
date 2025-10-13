@@ -9,6 +9,27 @@ import { RootStackParamList } from '../../types/navigation';
 import ProfileImagePicker from '../../components/ProfileImagePicker';
 import { imageService } from '../../services/imageService';
 import { updateProfile } from './services/profileService';
+import {
+  Container,
+  Header,
+  HeaderTitle,
+  HeaderSubtitle,
+  ProfileCard,
+  ProfileImageContainer,
+  RoleBadge,
+  RoleText,
+  FormCard,
+  InputContainer,
+  InputLabel,
+  InputLabelText,
+  StyledInput,
+  ButtonsContainer,
+  SaveButton,
+  SaveButtonText,
+  CancelButton,
+  CancelButtonText,
+  styles
+} from './styles';
 
 type EditProfileScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;

@@ -11,6 +11,27 @@ import TimeSlotList from '../../components/TimeSlotList';
 import { availableDoctors, Doctor } from './models/doctors';
 import { createAppointment } from './services/createAppointmentService';
 import { authService } from '../../services/auth';
+import {
+  Container,
+  Header,
+  HeaderTitle,
+  HeaderSubtitle,
+  FormCard,
+  InputContainer,
+  InputLabel,
+  InputLabelText,
+  DateInput,
+  SectionTitle,
+  LoadingContainer,
+  LoadingText,
+  ButtonsContainer,
+  PrimaryButton,
+  ButtonText,
+  SecondaryButton,
+  SecondaryButtonText,
+  ErrorText,
+  styles
+} from './styles';
 
 type CreateAppointmentScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'CreateAppointment'>;
