@@ -1,29 +1,43 @@
 // src/screens/HomeScreen/styles.ts
 import styled from 'styled-components/native';
-import { FlatList, TouchableOpacity } from 'react-native';
+import { FlatList, TouchableOpacity, View } from 'react-native';
 import theme from '../../styles/theme';
 
 export const Container = styled.View`
   flex: 1;
-  background-color: ${theme.colors.background};
+  background-color: ${props => props.theme.colors.background};
 `;
 
 export const HeaderContainer = styled.View`
-  background-color: ${theme.colors.primary};
-  padding: 16px;
-  align-items: center;
-  justify-content: center;
+  background-color: ${props => props.theme.colors.primary};
+  padding-horizontal: ${props => props.theme.spacing.lg}px;
+  padding-vertical: ${props => props.theme.spacing.lg}px;
+  padding-top: ${props => props.theme.spacing.xl}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: { width: 0, height: 2 };
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 4;
 `;
 
 export const HeaderTitle = styled.Text`
-  font-size: 20px;
-  font-weight: bold;
-  color: ${theme.colors.white};
+  font-size: ${props => props.theme.typography.heading.fontSize}px;
+  font-weight: ${props => props.theme.typography.heading.fontWeight};
+  color: ${props => props.theme.colors.white};
+  text-align: center;
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+`;
+
+export const HeaderSubtitle = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.white};
+  opacity: 0.9;
+  text-align: center;
 `;
 
 export const Content = styled.View`
   flex: 1;
-  padding: ${theme.spacing.medium}px;
+  padding: ${props => props.theme.spacing.lg}px;
 `;
 
 export const AppointmentList = styled(FlatList)`
@@ -31,77 +45,180 @@ export const AppointmentList = styled(FlatList)`
 `;
 
 export const AppointmentCard = styled.View`
-  background-color: ${theme.colors.white};
-  border-radius: 8px;
-  padding: ${theme.spacing.medium}px;
-  margin-bottom: ${theme.spacing.medium}px;
+  background-color: ${props => props.theme.colors.cardBackground};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  margin-bottom: ${props => props.theme.spacing.md}px;
+  ${props => props.theme.shadows.md};
+  border: 1px solid ${props => props.theme.colors.border};
+`;
+
+export const DoctorInfoContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  elevation: 2;
-  shadow-color: #000;
-  shadow-opacity: 0.1;
-  shadow-radius: 4px;
-  shadow-offset: 0px 2px;
+  margin-bottom: ${props => props.theme.spacing.md}px;
 `;
 
 export const DoctorImage = styled.Image`
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
-  margin-right: ${theme.spacing.medium}px;
+  width: ${props => props.theme.sizes.avatar.lg}px;
+  height: ${props => props.theme.sizes.avatar.lg}px;
+  border-radius: ${props => props.theme.sizes.avatar.lg / 2}px;
+  margin-right: ${props => props.theme.spacing.md}px;
+  border: 2px solid ${props => props.theme.colors.border};
 `;
 
-export const InfoContainer = styled.View`
+export const DoctorInfo = styled.View`
   flex: 1;
 `;
 
 export const DoctorName = styled.Text`
-  font-size: ${theme.typography.subtitle.fontSize}px;
-  font-weight: ${theme.typography.subtitle.fontWeight};
-  color: ${theme.colors.text};
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  font-weight: ${props => props.theme.typography.subtitle.fontWeight};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.xs}px;
 `;
 
 export const DoctorSpecialty = styled.Text`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${theme.colors.text};
-  opacity: 0.8;
-  margin-bottom: 4px;
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.textLight};
+  margin-bottom: ${props => props.theme.spacing.xs}px;
 `;
 
-export const DateTime = styled.Text`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${theme.colors.primary};
-  margin-top: 4px;
+export const AppointmentDetails = styled.View`
+  background-color: ${props => props.theme.colors.background};
+  border-radius: ${props => props.theme.borderRadius.md}px;
+  padding: ${props => props.theme.spacing.md}px;
+  margin-bottom: ${props => props.theme.spacing.md}px;
 `;
 
-export const Description = styled.Text`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${theme.colors.text};
-  opacity: 0.8;
-  margin-top: 4px;
+export const DetailRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: ${props => props.theme.spacing.sm}px;
 `;
 
-export const Status = styled.Text<{ status: string }>`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${(props: { status: string }) => props.status === 'pending' ? theme.colors.error : theme.colors.success};
-  margin-top: 4px;
-  font-weight: bold;
+export const DetailRowLast = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const DetailIcon = styled.View`
+  margin-right: ${props => props.theme.spacing.sm}px;
+`;
+
+export const DetailText = styled.Text`
+  flex: 1;
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.text};
+`;
+
+export const DetailLabel = styled.Text`
+  font-size: ${props => props.theme.typography.caption.fontSize}px;
+  color: ${props => props.theme.colors.textMuted};
+  margin-bottom: 2px;
+`;
+
+export const StatusContainer = styled.View`
+  align-items: flex-start;
+  margin-bottom: ${props => props.theme.spacing.md}px;
 `;
 
 export const ActionButtons = styled.View`
   flex-direction: row;
-  justify-content: flex-end;
-  margin-top: ${theme.spacing.small}px;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const LeftActions = styled.View`
+  flex-direction: row;
+`;
+
+export const RightActions = styled.View`
+  flex-direction: row;
 `;
 
 export const ActionButton = styled(TouchableOpacity)`
-  padding: ${theme.spacing.small}px;
-  margin-left: ${theme.spacing.small}px;
+  background-color: ${props => props.theme.colors.background};
+  border-radius: ${props => props.theme.borderRadius.md}px;
+  padding: ${props => props.theme.spacing.sm}px;
+  margin-right: ${props => props.theme.spacing.sm}px;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+`;
+
+export const DeleteButton = styled(ActionButton)`
+  background-color: ${props => props.theme.colors.error}15;
+`;
+
+export const EditButton = styled(ActionButton)`
+  background-color: ${props => props.theme.colors.primary}15;
+`;
+
+export const StatusBadge = styled.View<{ status: string }>`
+  background-color: ${props => {
+    switch (props.status) {
+      case 'confirmed':
+        return props.theme.colors.appointmentConfirmed + '20';
+      case 'pending':
+        return props.theme.colors.appointmentPending + '20';
+      case 'cancelled':
+        return props.theme.colors.appointmentCancelled + '20';
+      default:
+        return props.theme.colors.textMuted + '20';
+    }
+  }};
+  border-radius: ${props => props.theme.borderRadius.sm}px;
+  padding-horizontal: ${props => props.theme.spacing.sm}px;
+  padding-vertical: ${props => props.theme.spacing.xs}px;
+  align-self: flex-start;
+`;
+
+export const StatusText = styled.Text<{ status: string }>`
+  font-size: ${props => props.theme.typography.small.fontSize}px;
+  font-weight: 600;
+  color: ${props => {
+    switch (props.status) {
+      case 'confirmed':
+        return props.theme.colors.appointmentConfirmed;
+      case 'pending':
+        return props.theme.colors.appointmentPending;
+      case 'cancelled':
+        return props.theme.colors.appointmentCancelled;
+      default:
+        return props.theme.colors.textMuted;
+    }
+  }};
+`;
+
+export const EmptyContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  padding: ${props => props.theme.spacing.xl}px;
+`;
+
+export const EmptyIcon = styled.View`
+  width: 80px;
+  height: 80px;
+  border-radius: ${props => props.theme.borderRadius.xl}px;
+  background-color: ${props => props.theme.colors.primaryLight};
+  justify-content: center;
+  align-items: center;
+  margin-bottom: ${props => props.theme.spacing.lg}px;
 `;
 
 export const EmptyText = styled.Text`
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  color: ${props => props.theme.colors.textLight};
   text-align: center;
-  color: ${theme.colors.text};
-  opacity: 0.6;
-  margin-top: ${theme.spacing.large}px;
+  margin-bottom: ${props => props.theme.spacing.sm}px;
+`;
+
+export const EmptySubtext = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.textMuted};
+  text-align: center;
+  line-height: 22px;
 `;
