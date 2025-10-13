@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { ScrollView } from 'react-native';
-import { Button, Input } from 'react-native-elements';
+import styled from 'styled-components/native';
+import { ScrollView, View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/navigation';
-import Header from '../../components/Header';
 import DoctorList from '../../components/DoctorList';
 import TimeSlotList from '../../components/TimeSlotList';
 import { availableDoctors, Doctor } from './models/doctors';
 import { createAppointment } from './services/createAppointmentService';
-import { Container, Title, SectionTitle, ErrorText, styles } from './styles';
+import { authService } from '../../services/auth';
 
 type CreateAppointmentScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'CreateAppointment'>;
@@ -24,15 +24,74 @@ const CreateAppointmentScreen: React.FC = () => {
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [doctorsLoading, setDoctorsLoading] = useState(true);
+
+  React.useEffect(() => {
+    const loadDoctors = async () => {
+      try {
+        const doctorsList = await authService.getAllDoctors();
+        setDoctors(doctorsList);
+      } catch (error) {
+        console.error('Erro ao carregar médicos:', error);
+        // Usa os médicos mockados como fallback
+        setDoctors(availableDoctors);
+      } finally {
+        setDoctorsLoading(false);
+      }
+    };
+    loadDoctors();
+  }, []);
+
+  const validateDate = (inputDate: string) => {
+    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const match = inputDate.match(dateRegex);
+
+    if (!match) return false;
+
+    const [, day, month, year] = match;
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return date >= today;
+  };
+
+  const handleDateChange = (text: string) => {
+    const numbers = text.replace(/\D/g, '');
+
+    let formattedDate = '';
+    if (numbers.length > 0) {
+      if (numbers.length <= 2) {
+        formattedDate = numbers;
+      } else if (numbers.length <= 4) {
+        formattedDate = `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
+      } else {
+        formattedDate = `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+      }
+    }
+
+    setDate(formattedDate);
+  };
 
   const handleCreateAppointment = async () => {
     try {
       setLoading(true);
       setError('');
 
+      if (!date || !selectedTime || !selectedDoctor) {
+        setError('Por favor, preencha todos os campos');
+        return;
+      }
+
+      if (!validateDate(date)) {
+        setError('Por favor, insira uma data válida (DD/MM/AAAA)');
+        return;
+      }
+
       await createAppointment(date, selectedTime, selectedDoctor!, user!);
 
-      alert('Consulta agendada com sucesso!');
+      Alert.alert('Sucesso', 'Consulta agendada com sucesso!');
       navigation.goBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao agendar consulta. Tente novamente.');
@@ -43,17 +102,30 @@ const CreateAppointmentScreen: React.FC = () => {
 
   return (
     <Container>
-      <Header />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Title>Agendar Consulta</Title>
+      <Header>
+        <HeaderTitle>Agendar Consulta</HeaderTitle>
+        <HeaderSubtitle>Marque sua consulta com um de nossos especialistas</HeaderSubtitle>
+      </Header>
 
-        <Input
-          placeholder="Data (DD/MM/AAAA)"
-          value={date}
-          onChangeText={setDate}
-          containerStyle={styles.input}
-          keyboardType="numeric"
-        />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <FormCard>
+          <InputContainer>
+            <InputLabel>
+              <Ionicons name="calendar" size={16} color="#0066CC" />
+              <InputLabelText>Data da Consulta</InputLabel>
+            </InputLabel>
+            <DateInput
+              placeholder="DD/MM/AAAA"
+              value={date}
+              onChangeText={handleDateChange}
+              keyboardType="numeric"
+              maxLength={10}
+            />
+            {date && !validateDate(date) && (
+              <ErrorText>Data inválida. A data deve ser hoje ou uma data futura.</ErrorText>
+            )}
+          </InputContainer>
+        </FormCard>
 
         <SectionTitle>Selecione um Horário</SectionTitle>
         <TimeSlotList
@@ -62,28 +134,38 @@ const CreateAppointmentScreen: React.FC = () => {
         />
 
         <SectionTitle>Selecione um Médico</SectionTitle>
-        <DoctorList
-          doctors={availableDoctors}
-          onSelectDoctor={setSelectedDoctor}
-          selectedDoctorId={selectedDoctor?.id}
-        />
+        {doctorsLoading ? (
+          <LoadingContainer>
+            <ActivityIndicator size="large" color="#0066CC" />
+            <LoadingText>Carregando médicos...</LoadingText>
+          </LoadingContainer>
+        ) : (
+          <DoctorList
+            doctors={doctors}
+            onSelectDoctor={setSelectedDoctor}
+            selectedDoctorId={selectedDoctor?.id}
+          />
+        )}
 
         {error ? <ErrorText>{error}</ErrorText> : null}
 
-        <Button
-          title="Agendar"
-          onPress={handleCreateAppointment}
-          loading={loading}
-          containerStyle={styles.button}
-          buttonStyle={styles.buttonStyle}
-        />
+        <ButtonsContainer>
+          <PrimaryButton onPress={handleCreateAppointment} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <>
+                <Ionicons name="checkmark" size={20} color="#fff" />
+                <ButtonText>Agendar Consulta</ButtonText>
+              </>
+            )}
+          </PrimaryButton>
 
-        <Button
-          title="Cancelar"
-          onPress={() => navigation.goBack()}
-          containerStyle={styles.button}
-          buttonStyle={styles.cancelButton}
-        />
+          <SecondaryButton onPress={() => navigation.goBack()}>
+            <Ionicons name="close" size={20} color="#0066CC" />
+            <SecondaryButtonText>Cancelar</SecondaryButtonText>
+          </SecondaryButton>
+        </ButtonsContainer>
       </ScrollView>
     </Container>
   );

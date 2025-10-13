@@ -1,22 +1,14 @@
 import React, { useState } from 'react';
-import { ScrollView, ViewStyle, Alert } from 'react-native';
-import { Button, Input } from 'react-native-elements';
+import styled from 'styled-components/native';
+import { ScrollView, View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/navigation';
-import Header from '../../components/Header';
 import ProfileImagePicker from '../../components/ProfileImagePicker';
 import { imageService } from '../../services/imageService';
 import { updateProfile } from './services/profileService';
-import {
-  Container,
-  Title,
-  ProfileCard,
-  RoleBadge,
-  RoleText,
-  styles
-} from './styles';
 
 type EditProfileScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;
@@ -73,67 +65,125 @@ const EditProfileScreen: React.FC = () => {
     }
   };
 
+  const getRoleText = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'Administrador';
+      case 'doctor':
+        return 'Médico';
+      case 'patient':
+        return 'Paciente';
+      default:
+        return role;
+    }
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return props => props.theme.colors.primary;
+      case 'doctor':
+        return props => props.theme.colors.success;
+      case 'patient':
+        return props => props.theme.colors.secondary;
+      default:
+        return props => props.theme.colors.textMuted;
+    }
+  };
+
   return (
     <Container>
-      <Header />
+      <Header>
+        <HeaderTitle>Editar Perfil</HeaderTitle>
+        <HeaderSubtitle>Atualize suas informações pessoais</HeaderSubtitle>
+      </Header>
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Title>Editar Perfil</Title>
-
         <ProfileCard>
-          <ProfileImagePicker
-            currentImageUri={profileImage}
-            onImageSelected={handleImageSelected}
-            size={120}
-            editable={true}
-          />
-
-          <Input
-            label="Nome"
-            value={name}
-            onChangeText={setName}
-            containerStyle={styles.input}
-            placeholder="Digite seu nome"
-          />
-
-          <Input
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            containerStyle={styles.input}
-            placeholder="Digite seu email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
-          {user?.role === 'doctor' && (
-            <Input
-              label="Especialidade"
-              value={specialty}
-              onChangeText={setSpecialty}
-              containerStyle={styles.input}
-              placeholder="Digite sua especialidade"
+          <ProfileImageContainer>
+            <ProfileImagePicker
+              currentImageUri={profileImage}
+              onImageSelected={handleImageSelected}
+              size={120}
+              editable={true}
             />
-          )}
+          </ProfileImageContainer>
 
           <RoleBadge role={user?.role || ''}>
-            <RoleText>{user?.role === 'admin' ? 'Administrador' : user?.role === 'doctor' ? 'Médico' : 'Paciente'}</RoleText>
+            <Ionicons
+              name={
+                user?.role === 'admin' ? 'shield' :
+                user?.role === 'doctor' ? 'medical' : 'person'
+              }
+              size={16}
+              color="#fff"
+            />
+            <RoleText>{getRoleText(user?.role || '')}</RoleText>
           </RoleBadge>
         </ProfileCard>
 
-        <Button
-          title="Salvar Alterações"
-          onPress={handleSaveProfile}
-          loading={loading}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.saveButton}
-        />
+        <FormCard>
+          <InputContainer>
+            <InputLabel>
+              <Ionicons name="person" size={16} color="#0066CC" />
+              <InputLabelText>Nome Completo</InputLabel>
+            </InputLabel>
+            <StyledInput
+              value={name}
+              onChangeText={setName}
+              placeholder="Digite seu nome completo"
+              placeholderTextColor="#999"
+            />
+          </InputContainer>
 
-        <Button
-          title="Cancelar"
-          onPress={() => navigation.goBack()}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.cancelButton}
-        />
+          <InputContainer>
+            <InputLabel>
+              <Ionicons name="mail" size={16} color="#0066CC" />
+              <InputLabelText>Email</InputLabel>
+            </InputLabel>
+            <StyledInput
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Digite seu email"
+              placeholderTextColor="#999"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </InputContainer>
+
+          {user?.role === 'doctor' && (
+            <InputContainer>
+              <InputLabel>
+                <Ionicons name="medical" size={16} color="#0066CC" />
+                <InputLabelText>Especialidade</InputLabel>
+              </InputLabel>
+              <StyledInput
+                value={specialty}
+                onChangeText={setSpecialty}
+                placeholder="Digite sua especialidade"
+                placeholderTextColor="#999"
+              />
+            </InputContainer>
+          )}
+        </FormCard>
+
+        <ButtonsContainer>
+          <SaveButton onPress={handleSaveProfile} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <>
+                <Ionicons name="checkmark" size={20} color="#fff" />
+                <SaveButtonText>Salvar Alterações</SaveButtonText>
+              </>
+            )}
+          </SaveButton>
+
+          <CancelButton onPress={() => navigation.goBack()}>
+            <Ionicons name="close" size={20} color="#0066CC" />
+            <CancelButtonText>Cancelar</CancelButtonText>
+          </CancelButton>
+        </ButtonsContainer>
       </ScrollView>
     </Container>
   );
