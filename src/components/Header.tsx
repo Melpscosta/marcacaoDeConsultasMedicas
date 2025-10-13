@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { Avatar } from 'react-native-elements';
+import { Image, View } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
-import theme from '../styles/theme';
 import NotificationBell from './NotificationBell';
 
 const Header: React.FC = () => {
@@ -13,11 +12,8 @@ const Header: React.FC = () => {
   return (
     <Container>
       <UserInfo>
-        <Avatar
-          size="medium"
-          rounded
+        <UserAvatar
           source={{ uri: user.image }}
-          containerStyle={styles.avatar}
         />
         <TextContainer>
           <WelcomeText>Bem-vindo(a),</WelcomeText>
@@ -29,40 +25,46 @@ const Header: React.FC = () => {
   );
 };
 
-const styles = {
-  avatar: {
-    backgroundColor: theme.colors.primary,
-  },
-};
-
 const Container = styled.View`
-  background-color: ${theme.colors.primary};
-  padding: 16px;
+  background-color: ${props => props.theme.colors.primary};
+  padding: ${props => props.theme.spacing.md}px;
+  padding-top: ${props => props.theme.spacing.xl}px;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  border-bottom-width: 1px;
-  border-bottom-color: ${theme.colors.border};
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 4;
 `;
+
 const UserInfo = styled.View`
   flex-direction: row;
   align-items: center;
 `;
 
+const UserAvatar = styled.Image`
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  border: 2px solid ${props => props.theme.colors.white};
+`;
+
 const TextContainer = styled.View`
-  margin-left: 12px;
+  margin-left: ${props => props.theme.spacing.md}px;
 `;
 
 const WelcomeText = styled.Text`
-  font-size: 14px;
-  color: ${theme.colors.white};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.white};
   opacity: 0.9;
 `;
 
 const UserName = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  color: ${theme.colors.white};
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  font-weight: ${props => props.theme.typography.subtitle.fontWeight};
+  color: ${props => props.theme.colors.white};
 `;
 
 export default Header;

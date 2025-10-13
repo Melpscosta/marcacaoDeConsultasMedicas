@@ -33,49 +33,49 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({
 };
 
 const Container = styled.View<{ color: string }>`
-  background-color: ${theme.colors.white};
-  border-radius: 12px;
-  padding: 16px;
-  margin: 8px;
+  background-color: ${props => props.theme.colors.surface};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  margin: ${props => props.theme.spacing.sm}px;
   min-height: 120px;
   justify-content: space-between;
   border-left-width: 4px;
   border-left-color: ${(props) => props.color};
-  shadow-color: ${theme.colors.text};
+  shadow-color: ${props => props.theme.colors.text};
   shadow-offset: 0px 2px;
   shadow-opacity: 0.1;
   shadow-radius: 4px;
   elevation: 3;
+  border: 1px solid ${props => props.theme.colors.border};
 `;
 
 const Header = styled.View`
   flex-direction: row;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: ${props => props.theme.spacing.sm}px;
 `;
 
 const IconContainer = styled.View`
-  margin-right: 8px;
+  margin-right: ${props => props.theme.spacing.sm}px;
 `;
 
 const Title = styled.Text`
-  font-size: 14px;
-  color: ${theme.colors.text};
-  font-weight: 500;
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.text};
+  font-weight: ${props => props.theme.typography.body.fontWeight};
   opacity: 0.8;
 `;
 
 const Value = styled.Text<{ color: string }>`
-  font-size: 28px;
-  font-weight: bold;
+  font-size: ${props => props.theme.typography.heading.fontSize}px;
+  font-weight: ${props => props.theme.typography.heading.fontWeight};
   color: ${(props) => props.color};
-  margin-bottom: 4px;
+  margin-bottom: ${props => props.theme.spacing.xs}px;
 `;
 
 const Subtitle = styled.Text`
-  font-size: 12px;
-  color: ${theme.colors.text};
-  opacity: 0.6;
+  font-size: ${props => props.theme.typography.small.fontSize}px;
+  color: ${props => props.theme.colors.textMuted};
 `;
 
 export default StatisticsCard;
