@@ -191,16 +191,35 @@ const LoginScreen: React.FC = () => {
         </RegisterButton>
 
         <DemoCredentials>
-          <DemoTitle>Contas de Demonstração:</DemoTitle>
+          <DemoTitle>Contas de Teste Rápidas:</DemoTitle>
           <DemoText>
-            <DemoLabel>Administrador:</DemoLabel> admin@example.com / 123456
+            <DemoLabel>🔑 Administrador:</DemoLabel> admin@example.com / 123456
           </DemoText>
           <DemoText>
-            <DemoLabel>Médico:</DemoLabel> joao@example.com / 123456
+            <DemoLabel>👨‍⚕️ Médico:</DemoLabel> joao@example.com / 123456
           </DemoText>
           <DemoText>
-            <DemoLabel>Paciente:</DemoLabel> maria@example.com / 123456
+            <DemoLabel>👤 Paciente:</DemoLabel> teste@paciente.com / 123456
           </DemoText>
+
+          <DemoSectionTitle>Outras Opções:</DemoSectionTitle>
+          <DemoText>
+            <DemoLabel>Médicos disponíveis:</DemoLabel>
+          </DemoText>
+          <DemoText>• Dra. Maria Santos (maria@example.com)</DemoText>
+          <DemoText>• Dr. Pedro Oliveira (pedro@example.com)</DemoText>
+          <DemoText>• Dra. Ana Costa (ana.doctor@example.com)</DemoText>
+          <DemoText>• Dr. Carlos Mendes (carlos.doctor@example.com)</DemoText>
+
+          <DemoText>
+            <DemoLabel>Pacientes disponíveis:</DemoLabel>
+          </DemoText>
+          <DemoText>• Ana Paciente (ana@exemplo.com)</DemoText>
+          <DemoText>• Carlos Paciente (carlos@exemplo.com)</DemoText>
+          <DemoText>• Maria Paciente (maria@exemplo.com)</DemoText>
+          <DemoText>• Pedro Usuário (pedro@usuario.com)</DemoText>
+
+          <DemoNote>Todos usam a senha: <DemoHighlight>123456</DemoHighlight></DemoNote>
         </DemoCredentials>
       </FormContainer>
 
@@ -390,6 +409,26 @@ const DemoText = styled.Text`
 const DemoLabel = styled.Text`
   font-weight: 600;
   color: ${props => props.theme.colors.text};
+`;
+
+const DemoSectionTitle = styled.Text`
+  font-size: ${props => props.theme.typography.caption.fontSize}px;
+  font-weight: 600;
+  color: ${props => props.theme.colors.primaryDark};
+  margin-top: ${props => props.theme.spacing.md}px;
+  margin-bottom: ${props => props.theme.spacing.sm}px;
+`;
+
+const DemoNote = styled.Text`
+  font-size: ${props => props.theme.typography.small.fontSize}px;
+  color: ${props => props.theme.colors.textMuted};
+  margin-top: ${props => props.theme.spacing.md}px;
+  text-align: center;
+`;
+
+const DemoHighlight = styled.Text`
+  font-weight: 600;
+  color: ${props => props.theme.colors.primary};
 `;
 
 export default LoginScreen; 
