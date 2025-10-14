@@ -6,6 +6,10 @@
 
 **Plataforma moderna para agendamento de consultas médicas**
 
+Lu Vieira Santos
+Melissa Pereira
+Diego Furigo
+
 [![React Native](https://img.shields.io/badge/React%20Native-0.76.7-blue.svg)](https://reactnative.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue.svg)](https://www.typescriptlang.org/)
 [![Expo](https://img.shields.io/badge/Expo-52.0.39-blue.svg)](https://expo.dev/)
