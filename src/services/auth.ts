@@ -17,7 +17,7 @@ const mockDoctors = [
     email: 'joao@example.com',
     role: 'doctor' as const,
     specialty: 'Cardiologia',
-    image: getProfileImage('João Silva', 'doctor'),
+    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
   },
   {
     id: '2',
@@ -25,7 +25,7 @@ const mockDoctors = [
     email: 'maria@example.com',
     role: 'doctor' as const,
     specialty: 'Pediatria',
-    image: getProfileImage('Maria Santos', 'doctor'),
+    image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
   },
   {
     id: '3',
@@ -33,7 +33,7 @@ const mockDoctors = [
     email: 'pedro@example.com',
     role: 'doctor' as const,
     specialty: 'Ortopedia',
-    image: getProfileImage('Pedro Oliveira', 'doctor'),
+    image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face',
   },
   {
     id: '4',
@@ -41,7 +41,7 @@ const mockDoctors = [
     email: 'ana.doctor@example.com',
     role: 'doctor' as const,
     specialty: 'Dermatologia',
-    image: getProfileImage('Ana Costa', 'doctor'),
+    image: 'https://images.unsplash.com/photo-1594824475063-1b1ad4e6c0c6?w=150&h=150&fit=crop&crop=face',
   },
   {
     id: '5',
@@ -49,7 +49,7 @@ const mockDoctors = [
     email: 'carlos.doctor@example.com',
     role: 'doctor' as const,
     specialty: 'Clínico Geral',
-    image: getProfileImage('Carlos Mendes', 'doctor'),
+    image: 'https://images.unsplash.com/photo-1618498082410-b4aa8211a357?w=150&h=150&fit=crop&crop=face',
   },
 ];
 
@@ -59,7 +59,7 @@ const mockAdmin = {
   name: 'Administrador',
   email: 'admin@example.com',
   role: 'admin' as const,
-  image: getProfileImage('Administrador', 'user'),
+  image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face',
 };
 
 // Lista de usuários cadastrados (pacientes)
@@ -70,7 +70,7 @@ let registeredUsers: (User & { password: string })[] = [
     name: 'Ana Paciente',
     email: 'ana@exemplo.com',
     role: 'patient' as const,
-    image: getProfileImage('Ana Paciente', 'patient'),
+    image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
     password: '123456',
   },
   {
@@ -78,7 +78,7 @@ let registeredUsers: (User & { password: string })[] = [
     name: 'Carlos Paciente',
     email: 'carlos@exemplo.com',
     role: 'patient' as const,
-    image: getProfileImage('Carlos Paciente', 'patient'),
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
     password: '123456',
   },
   {
@@ -86,7 +86,7 @@ let registeredUsers: (User & { password: string })[] = [
     name: 'Maria Paciente',
     email: 'maria@exemplo.com',
     role: 'patient' as const,
-    image: getProfileImage('Maria Paciente', 'patient'),
+    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
     password: '123456',
   },
   {
@@ -94,7 +94,7 @@ let registeredUsers: (User & { password: string })[] = [
     name: 'João Teste',
     email: 'teste@paciente.com',
     role: 'patient' as const,
-    image: getProfileImage('João Teste', 'patient'),
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     password: '123456',
   },
   {
@@ -102,7 +102,7 @@ let registeredUsers: (User & { password: string })[] = [
     name: 'Pedro Usuário',
     email: 'pedro@usuario.com',
     role: 'patient' as const,
-    image: getProfileImage('Pedro Usuário', 'patient'),
+    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
     password: '123456',
   }
 ];

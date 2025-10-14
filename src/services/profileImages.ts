@@ -3,76 +3,76 @@
  * Fornece URLs fixas e consistentes para médicos e pacientes
  */
 
-// URLs de imagens para médicos (profissionais de saúde)
+// URLs de imagens para médicos (profissionais de saúde) - Unsplash URLs fixas
 export const DOCTOR_IMAGES = {
   // Cardiologistas
-  'dr-joao-silva': 'https://randomuser.me/api/portraits/men/32.jpg',
-  'dr-carlos-mendes': 'https://randomuser.me/api/portraits/men/45.jpg',
-  'dra-ana-costa': 'https://randomuser.me/api/portraits/women/28.jpg',
+  'dr-joao-silva': 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
+  'dr-carlos-mendes': 'https://images.unsplash.com/photo-1618498082410-b4aa8211a357?w=150&h=150&fit=crop&crop=face',
+  'dra-ana-costa': 'https://images.unsplash.com/photo-1594824475063-1b1ad4e6c0c6?w=150&h=150&fit=crop&crop=face',
 
   // Pediatras
-  'dra-maria-santos': 'https://randomuser.me/api/portraits/women/44.jpg',
-  'dr-pedro-almeida': 'https://randomuser.me/api/portraits/men/22.jpg',
-  'dra-juliana-pereira': 'https://randomuser.me/api/portraits/women/36.jpg',
+  'dra-maria-santos': 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
+  'dr-pedro-almeida': 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face',
+  'dra-juliana-pereira': 'https://images.unsplash.com/photo-1622253694298-26805b27aac1?w=150&h=150&fit=crop&crop=face',
 
   // Clínicos gerais
-  'dr-roberto-fernandes': 'https://randomuser.me/api/portraits/men/54.jpg',
-  'dra-patricia-lima': 'https://randomuser.me/api/portraits/women/42.jpg',
-  'dr-luis-oliveira': 'https://randomuser.me/api/portraits/men/38.jpg',
+  'dr-roberto-fernandes': 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face',
+  'dra-patricia-lima': 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
+  'dr-luis-oliveira': 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
 
   // Ortopedistas
-  'dr-marcos-barbosa': 'https://randomuser.me/api/portraits/men/48.jpg',
-  'dra-fabiana-dias': 'https://randomuser.me/api/portraits/women/31.jpg',
+  'dr-marcos-barbosa': 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face',
+  'dra-fabiana-dias': 'https://images.unsplash.com/photo-1594824475063-1b1ad4e6c0c6?w=150&h=150&fit=crop&crop=face',
 
   // Dermatologistas
-  'dra-camila-rocha': 'https://randomuser.me/api/portraits/women/26.jpg',
-  'dr-thiago-martins': 'https://randomuser.me/api/portraits/men/29.jpg',
+  'dra-camila-rocha': 'https://images.unsplash.com/photo-1594824475063-1b1ad4e6c0c6?w=150&h=150&fit=crop&crop=face',
+  'dr-thiago-martins': 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
 
   // Ginecologistas
-  'dra-elena-castro': 'https://randomuser.me/api/portraits/women/39.jpg',
-  'dra-renata-souza': 'https://randomuser.me/api/portraits/women/47.jpg',
+  'dra-elena-castro': 'https://images.unsplash.com/photo-1622253694298-26805b27aac1?w=150&h=150&fit=crop&crop=face',
+  'dra-renata-souza': 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
 
   // Psiquiatras
-  'dr-antonio-vieira': 'https://randomuser.me/api/portraits/men/52.jpg',
-  'dra-claudia-ribeiro': 'https://randomuser.me/api/portraits/women/33.jpg',
+  'dr-antonio-vieira': 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face',
+  'dra-claudia-ribeiro': 'https://images.unsplash.com/photo-1594824475063-1b1ad4e6c0c6?w=150&h=150&fit=crop&crop=face',
 
   // Endocrinologistas
-  'dra-melissa-nogueira': 'https://randomuser.me/api/portraits/women/30.jpg',
-  'dr-felipe-garcia': 'https://randomuser.me/api/portraits/men/41.jpg',
+  'dra-melissa-nogueira': 'https://images.unsplash.com/photo-1622253694298-26805b27aac1?w=150&h=150&fit=crop&crop=face',
+  'dr-felipe-garcia': 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
 };
 
-// URLs de imagens para pacientes
+// URLs de imagens para pacientes - Unsplash URLs fixas
 export const PATIENT_IMAGES = {
   // Pacientes do sexo masculino
-  'joao-paciente': 'https://randomuser.me/api/portraits/men/15.jpg',
-  'carlos-paciente': 'https://randomuser.me/api/portraits/men/25.jpg',
-  'pedro-paciente': 'https://randomuser.me/api/portraits/men/35.jpg',
-  'lucas-paciente': 'https://randomuser.me/api/portraits/men/12.jpg',
-  'mateus-paciente': 'https://randomuser.me/api/portraits/men/18.jpg',
-  'gabriel-paciente': 'https://randomuser.me/api/portraits/men/21.jpg',
-  'bruno-paciente': 'https://randomuser.me/api/portraits/men/27.jpg',
-  'diego-paciente': 'https://randomuser.me/api/portraits/men/33.jpg',
-  'tiago-paciente': 'https://randomuser.me/api/portraits/men/39.jpg',
-  'rafael-paciente': 'https://randomuser.me/api/portraits/men/43.jpg',
+  'joao-paciente': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+  'carlos-paciente': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+  'pedro-paciente': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+  'lucas-paciente': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+  'mateus-paciente': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+  'gabriel-paciente': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+  'bruno-paciente': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+  'diego-paciente': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+  'tiago-paciente': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+  'rafael-paciente': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
 
   // Pacientes do sexo feminino
-  'maria-paciente': 'https://randomuser.me/api/portraits/women/15.jpg',
-  'ana-paciente': 'https://randomuser.me/api/portraits/women/25.jpg',
-  'julia-paciente': 'https://randomuser.me/api/portraits/women/35.jpg',
-  'beatriz-paciente': 'https://randomuser.me/api/portraits/women/12.jpg',
-  'camila-paciente': 'https://randomuser.me/api/portraits/women/18.jpg',
-  'luana-paciente': 'https://randomuser.me/api/portraits/women/21.jpg',
-  'vitoria-paciente': 'https://randomuser.me/api/portraits/women/27.jpg',
-  'isabella-paciente': 'https://randomuser.me/api/portraits/women/33.jpg',
-  'larissa-paciente': 'https://randomuser.me/api/portraits/women/39.jpg',
-  'mariana-paciente': 'https://randomuser.me/api/portraits/women/43.jpg',
+  'maria-paciente': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+  'ana-paciente': 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+  'julia-paciente': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+  'beatriz-paciente': 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+  'camila-paciente': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+  'luana-paciente': 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+  'vitoria-paciente': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+  'isabella-paciente': 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+  'larissa-paciente': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+  'mariana-paciente': 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
 };
 
 // Imagem padrão para quando não houver imagem específica
 export const DEFAULT_IMAGES = {
-  doctor: 'https://randomuser.me/api/portraits/lego/0.jpg',
-  patient: 'https://randomuser.me/api/portraits/lego/1.jpg',
-  user: 'https://randomuser.me/api/portraits/lego/2.jpg',
+  doctor: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
+  patient: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+  user: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face',
 };
 
 /**

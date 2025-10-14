@@ -12,6 +12,7 @@ import { statisticsService, Statistics } from '../services/statistics';
 import AppointmentActionModal from '../components/AppointmentActionModal';
 import { notificationService } from '../services/notifications';
 import { StatusBadge } from '../components/FeedbackMessages';
+import theme from '../styles/theme';
 
 type DoctorDashboardScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'DoctorDashboard'>;

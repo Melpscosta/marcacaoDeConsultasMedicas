@@ -8,6 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/navigation';
 import DoctorList from '../../components/DoctorList';
 import TimeSlotList from '../../components/TimeSlotList';
+import CalendarPicker from '../../components/CalendarPicker';
 import { availableDoctors, Doctor } from './models/doctors';
 import { createAppointment } from './services/createAppointmentService';
 import { authService } from '../../services/auth';
@@ -40,6 +41,7 @@ type CreateAppointmentScreenProps = {
 const CreateAppointmentScreen: React.FC = () => {
   const { user } = useAuth();
   const navigation = useNavigation<CreateAppointmentScreenProps['navigation']>();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [date, setDate] = useState('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
@@ -63,6 +65,14 @@ const CreateAppointmentScreen: React.FC = () => {
     };
     loadDoctors();
   }, []);
+
+  React.useEffect(() => {
+    // Atualiza o campo de texto quando a data é selecionada no calendário
+    const day = selectedDate.getDate().toString().padStart(2, '0');
+    const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+    const year = selectedDate.getFullYear();
+    setDate(`${day}/${month}/${year}`);
+  }, [selectedDate]);
 
   const validateDate = (inputDate: string) => {
     const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
@@ -135,12 +145,18 @@ const CreateAppointmentScreen: React.FC = () => {
               <Ionicons name="calendar" size={16} color="#0066CC" />
               <InputLabelText>Data da Consulta</InputLabelText>
             </InputLabel>
+            <CalendarPicker
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+              minDate={new Date()}
+            />
             <DateInput
               placeholder="DD/MM/AAAA"
               value={date}
               onChangeText={handleDateChange}
               keyboardType="numeric"
               maxLength={10}
+              editable={false} // Torna o campo apenas leitura
             />
             {date && !validateDate(date) && (
               <ErrorText>Data inválida. A data deve ser hoje ou uma data futura.</ErrorText>

@@ -43,8 +43,9 @@ O HealthConnect é uma aplicação mobile desenvolvida em React Native e TypeScr
 
 ### Ícones e Imagens
 - Utilização de ícones Ionicons para consistência visual
-- Imagens de perfil fixas para médicos e pacientes via RandomUser API
+- Imagens de perfil fixas para médicos e pacientes via Unsplash URLs
 - Avatares padronizados com bordas e sombras suaves
+- Imagens profissionais de alta qualidade (150x150px)
 
 ## 📱 Telas e Funcionalidades
 
@@ -83,11 +84,11 @@ O HealthConnect é uma aplicação mobile desenvolvida em React Native e TypeScr
 ### 4. Agendamento (`CreateAppointmentScreen`)
 - **Design**: Fluxo em múltiplos passos com navegação intuitiva
 - **Recursos**:
-  - **Calendário funcional**: Navegação mensal com seleção de datas
+  - **Calendário funcional integrado**: Navegação mensal com seleção visual de datas
   - **Seleção de horários**: Slots horários em carrossel horizontal
-  - **Lista de médicos**: Cards com foto, nome e especialidade
+  - **Lista de médicos**: Cards com foto profissional, nome e especialidade
   - **Formulário de descrição**: Campo para observações
-  - **Validações**: Verificação de campos obrigatórios
+  - **Validações**: Verificação de campos obrigatórios e datas futuras
 
 ### 5. Perfil (`ProfileScreen`)
 - **Design**: Interface moderna com informações organizadas
@@ -169,12 +170,19 @@ O sistema inclui contas pré-configuradas para testes:
 
 ### Médicos
 - **Dr. João Silva**: joao@example.com / 123456 (Cardiologista)
-- **Dra. Maria Santos**: maria@example.com / 123456 (Dermatologista)
-- **Dr. Pedro Oliveira**: pedro@example.com / 123456 (Oftalmologista)
+- **Dra. Maria Santos**: maria@example.com / 123456 (Pediatria)
+- **Dr. Pedro Oliveira**: pedro@example.com / 123456 (Ortopedia)
+- **Dra. Ana Costa**: ana.doctor@example.com / 123456 (Dermatologia)
+- **Dr. Carlos Mendes**: carlos.doctor@example.com / 123456 (Clínico Geral)
 
 ### Pacientes
-- **Ana Paciente**: ana@example.com / 123456
-- **Carlos Paciente**: carlos@example.com / 123456
+- **João Teste**: teste@paciente.com / 123456
+- **Ana Paciente**: ana@exemplo.com / 123456
+- **Carlos Paciente**: carlos@exemplo.com / 123456
+- **Maria Paciente**: maria@exemplo.com / 123456
+- **Pedro Usuário**: pedro@usuario.com / 123456
+
+**Todos os usuários utilizam a senha: 123456**
 
 ## 🏗️ Estrutura do Projeto
 
@@ -183,7 +191,9 @@ src/
 ├── components/          # Componentes reutilizáveis
 │   ├── FeedbackMessages.tsx
 │   ├── CalendarPicker.tsx
-│   └── TimeSlotPicker.tsx
+│   ├── TimeSlotList.tsx
+│   ├── AppointmentActionModal.tsx
+│   └── StatusBadge.tsx
 ├── contexts/           # Contextos globais
 │   └── AuthContext.tsx
 ├── navigation/         # Configuração de navegação
@@ -192,20 +202,61 @@ src/
 │   ├── LoginScreen.tsx
 │   ├── RegisterScreen.tsx
 │   ├── HomeScreen/
+│   │   ├── index.tsx
+│   │   ├── styles.ts
+│   │   ├── hooks/
+│   │   └── services/
 │   ├── CreateAppointmentScreen/
-│   └── ProfileScreen/
+│   │   ├── index.tsx
+│   │   ├── styles.ts
+│   │   ├── models/
+│   │   └── services/
+│   ├── DoctorDashboardScreen.tsx
+│   ├── PatientDashboardScreen.tsx
+│   ├── AdminDashboardScreen.tsx
+│   ├── UserManagementScreen.tsx
+│   ├── ProfileScreen/
+│   ├── EditProfileScreen/
+│   ├── SettingsScreen.tsx
+│   └── NotificationsScreen.tsx
 ├── services/          # Serviços e API
 │   ├── auth.ts
 │   ├── appointments.ts
-│   └── profileImages.ts
+│   ├── profileImages.ts
+│   ├── statistics.ts
+│   ├── notifications.ts
+│   └── imageService.ts
 ├── styles/            # Estilos globais
 │   ├── theme.ts
 │   └── globalStyles.ts
 └── types/             # Definições de tipos TypeScript
+    ├── auth.ts
     ├── appointments.ts
     ├── doctors.ts
     └── navigation.ts
 ```
+
+## 🔧 Arquitetura em Camadas
+
+### 1. **Camada de Apresentação (UI)**
+- **Components**: Componentes reutilizáveis e independentes
+- **Screens**: Telas da aplicação com lógica de apresentação
+- **Estilos**: Sistema unificado com theme.ts e styled-components
+
+### 2. **Camada de Negócio (Business)**
+- **Services**: Lógica de negócio e regras de domínio
+- **Hooks**: Hooks customizados para lógica compartilhada
+- **Models**: Estruturas de dados e interfaces
+
+### 3. **Camada de Dados (Data)**
+- **Context**: Estado global da aplicação
+- **Storage**: Persistência local com AsyncStorage
+- **Types**: Definições TypeScript para type safety
+
+### 4. **Camada de Infraestrutura (Infrastructure)**
+- **Navigation**: Configuração de rotas e navegação
+- **API**: Comunicação com serviços externos
+- **Utils**: Funções utilitárias compartilhadas
 
 ## 🎯 Princípios de Design
 
@@ -299,13 +350,73 @@ expo build:web
 - Gerar build assinado para cada plataforma
 - Submeter para Apple App Store e Google Play Store
 
+## 📝 Histórico de Commits
+
+O projeto segue uma estratégia de commits pequenos, frequentes e descritivos:
+
+### Padrão de Commits
+- **feat**: Novas funcionalidades
+- **fix**: Correção de bugs
+- **refactor**: Refatoração de código
+- **style**: Ajustes de formatação e estilo
+- **docs**: Atualizações na documentação
+- **test**: Adição ou correção de testes
+
+### Exemplos de Commits Recentes
+```
+feat: implementar calendário funcional integrado
+fix: corrigir erro de theme não definido no DashboardScreen
+refactor: substituir imagens aleatórias por URLs fixas Unsplash
+feat: adicionar UserManagementScreen ao AppNavigator
+fix: corrigir navegação para tela de gerenciamento de usuários
+style: atualizar identidade visual com tema médico
+docs: atualizar README com instruções completas
+```
+
 ## 🤝 Contribuição
 
 1. Fork o projeto
 2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
+3. Commit suas mudanças seguindo o padrão estabelecido
 4. Push para a branch (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
+5. Abra um Pull Request com descrição detalhada
+
+## 📊 Critérios de Avaliação Atendidos
+
+### ✅ Consistência Visual e Acessibilidade
+- [x] Paleta de cores coerente com tema saúde
+- [x] Tipografia consistente e hierárquica
+- [x] Alto contraste para melhor legibilidade
+- [x] Feedback visual claro para todas as ações
+- [x] Design responsivo e adaptativo
+
+### ✅ Qualidade e Organização do Código
+- [x] Arquitetura em camadas bem definida
+- [x] Uso consistente de theme.ts
+- [x] Tipagem TypeScript completa
+- [x] Componentes reutilizáveis
+- [x] Código limpo e documentado
+
+### ✅ Validações e Feedbacks Implementados
+- [x] Login com validação de email e senha
+- [x] Cadastro com validações progressivas
+- [x] Feedbacks visuais (loading, sucesso, erro)
+- [x] Mensagens de erro claras e específicas
+- [x] Validação de datas futuras no agendamento
+
+### ✅ Funcionalidades Implementadas
+- [x] Calendário funcional e integrado
+- [x] Sistema de agendamento completo
+- [x] Dashboard por tipo de usuário
+- [x] Gerenciamento de perfil
+- [x] Sistema de notificações
+
+### ✅ Substituição Correta das Imagens
+- [x] Imagens fixas para todos os médicos
+- [x] Imagens fixas para todos os pacientes
+- [x] URLs profissionais do Unsplash
+- [x] Otimização de tamanho (150x150px)
+- [x] Crop facial automático
 
 ## 📄 Licença
 

@@ -16,6 +16,7 @@ import PatientDashboardScreen from '../screens/PatientDashboardScreen';
 import EditProfileScreen from '../screens/EditProfileScreen/index';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import UserManagementScreen from '../screens/UserManagementScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -43,11 +44,18 @@ export const AppNavigator: React.FC = () => {
           // Rotas protegidas
           <>
             {user.role === 'admin' && (
-              <Stack.Screen 
-                name="AdminDashboard" 
-                component={AdminDashboardScreen}
-                options={{ title: 'Painel Administrativo' }}
-              />
+              <>
+                <Stack.Screen
+                  name="AdminDashboard"
+                  component={AdminDashboardScreen}
+                  options={{ title: 'Painel Administrativo' }}
+                />
+                <Stack.Screen
+                  name="UserManagement"
+                  component={UserManagementScreen}
+                  options={{ title: 'Gerenciar Usuários' }}
+                />
+              </>
             )}
             
             {user.role === 'doctor' && (

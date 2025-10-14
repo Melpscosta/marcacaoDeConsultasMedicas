@@ -9,6 +9,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBadge } from '../components/FeedbackMessages';
+import theme from '../styles/theme';
 
 type PatientDashboardScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'PatientDashboard'>;
