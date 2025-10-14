@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { ScrollView, ViewStyle, Alert } from 'react-native';
-import { Button, ListItem, Badge } from 'react-native-elements';
+import { ScrollView, View, Text, TouchableOpacity, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
-import theme from '../styles/theme';
-import Header from '../components/Header';
 import { notificationService, Notification } from '../services/notifications';
 
 type NotificationsScreenProps = {
@@ -110,65 +108,65 @@ const NotificationsScreen: React.FC = () => {
 
   return (
     <Container>
-      <Header />
+      <Header>
+        <HeaderTitle>Notificações</HeaderTitle>
+        <HeaderSubtitle>Gerencie suas notificações</HeaderSubtitle>
+      </Header>
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <TitleContainer>
           <Title>Notificações</Title>
           {unreadCount > 0 && (
-            <Badge
-              value={unreadCount}
-              status="error"
-              containerStyle={styles.badge}
-            />
+            <UnreadBadge>
+              <UnreadCount>{unreadCount}</UnreadCount>
+            </UnreadBadge>
           )}
         </TitleContainer>
 
         {unreadCount > 0 && (
-          <Button
-            title="Marcar todas como lidas"
-            onPress={handleMarkAllAsRead}
-            containerStyle={styles.markAllButton as ViewStyle}
-            buttonStyle={styles.markAllButtonStyle}
-          />
+          <MarkAllButton onPress={handleMarkAllAsRead}>
+            <Ionicons name="checkmark-done" size={20} color="#fff" />
+            <ButtonText>Marcar todas como lidas</ButtonText>
+          </MarkAllButton>
         )}
 
-        <Button
-          title="Voltar"
-          onPress={() => navigation.goBack()}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.buttonStyle}
-        />
-
         {loading ? (
-          <LoadingText>Carregando notificações...</LoadingText>
+          <LoadingContainer>
+            <Ionicons name="notifications-outline" size={48} color={props => props.theme.colors.textMuted} />
+            <LoadingText>Carregando notificações...</LoadingText>
+          </LoadingContainer>
         ) : notifications.length === 0 ? (
           <EmptyContainer>
+            <Ionicons name="notifications-off-outline" size={64} color={props => props.theme.colors.textMuted} />
             <EmptyText>Nenhuma notificação encontrada</EmptyText>
           </EmptyContainer>
         ) : (
           notifications.map((notification) => (
-            <NotificationCard key={notification.id} isRead={notification.read}>
-              <ListItem
-                onPress={() => !notification.read && handleMarkAsRead(notification.id)}
-                onLongPress={() => handleDeleteNotification(notification.id)}
-              >
-                <NotificationIcon>{getNotificationIcon(notification.type)}</NotificationIcon>
-                <ListItem.Content>
-                  <NotificationHeader>
-                    <ListItem.Title style={styles.title}>
-                      {notification.title}
-                    </ListItem.Title>
+            <NotificationCard
+              key={notification.id}
+              isRead={notification.read}
+              onPress={() => !notification.read && handleMarkAsRead(notification.id)}
+              onLongPress={() => handleDeleteNotification(notification.id)}
+            >
+              <NotificationContent>
+                <NotificationHeader>
+                  <NotificationIcon>{getNotificationIcon(notification.type)}</NotificationIcon>
+                  <NotificationInfo>
+                    <NotificationTitle>{notification.title}</NotificationTitle>
                     {!notification.read && <UnreadDot />}
-                  </NotificationHeader>
-                  <ListItem.Subtitle style={styles.message}>
-                    {notification.message}
-                  </ListItem.Subtitle>
-                  <DateText>{formatDate(notification.createdAt)}</DateText>
-                </ListItem.Content>
-              </ListItem>
+                  </NotificationInfo>
+                </NotificationHeader>
+                <NotificationMessage>{notification.message}</NotificationMessage>
+                <DateText>{formatDate(notification.createdAt)}</DateText>
+              </NotificationContent>
             </NotificationCard>
           ))
         )}
+
+        <BackButton onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={20} color="#0066CC" />
+          <ButtonText>Voltar</ButtonText>
+        </BackButton>
       </ScrollView>
     </Container>
   );
@@ -177,110 +175,194 @@ const NotificationsScreen: React.FC = () => {
 const styles = {
   scrollContent: {
     padding: 20,
-  },
-  badge: {
-    marginLeft: 8,
-  },
-  markAllButton: {
-    marginBottom: 15,
-    width: '100%',
-  },
-  markAllButtonStyle: {
-    backgroundColor: theme.colors.success,
-    paddingVertical: 10,
-  },
-  button: {
-    marginBottom: 20,
-    width: '100%',
-  },
-  buttonStyle: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 12,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-  },
-  message: {
-    fontSize: 14,
-    color: theme.colors.text,
-    marginTop: 4,
-    lineHeight: 20,
+    flexGrow: 1,
   },
 };
 
 const Container = styled.View`
   flex: 1;
-  background-color: ${theme.colors.background};
+  background-color: ${props => props.theme.colors.background};
+`;
+
+const Header = styled.View`
+  background-color: ${props => props.theme.colors.primary};
+  padding-horizontal: ${props => props.theme.spacing.lg}px;
+  padding-vertical: ${props => props.theme.spacing.lg}px;
+  padding-top: ${props => props.theme.spacing.xl}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 4;
+`;
+
+const HeaderTitle = styled.Text`
+  font-size: ${props => props.theme.typography.heading.fontSize}px;
+  font-weight: ${props => props.theme.typography.heading.fontWeight};
+  color: ${props => props.theme.colors.white};
+  text-align: center;
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+`;
+
+const HeaderSubtitle = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.white};
+  opacity: 0.9;
+  text-align: center;
 `;
 
 const TitleContainer = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: ${props => props.theme.spacing.lg}px;
 `;
 
 const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  text-align: center;
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  font-weight: ${props => props.theme.typography.subtitle.fontWeight};
+  color: ${props => props.theme.colors.text};
+`;
+
+const UnreadBadge = styled.View`
+  background-color: ${props => props.theme.colors.error};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  min-width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  margin-left: ${props => props.theme.spacing.sm}px;
+`;
+
+const UnreadCount = styled.Text`
+  color: #fff;
+  font-size: ${props => props.theme.typography.small.fontSize}px;
+  font-weight: 600;
+`;
+
+const MarkAllButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.success};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.md}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${props => props.theme.spacing.lg}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+const ButtonText = styled.Text`
+  color: ${props => props.theme.colors.white};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  margin-left: ${props => props.theme.spacing.sm}px;
+`;
+
+const LoadingContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+  padding: ${props => props.theme.spacing.xl}px;
 `;
 
 const LoadingText = styled.Text`
-  text-align: center;
-  color: ${theme.colors.text};
-  font-size: 16px;
-  margin-top: 20px;
+  color: ${props => props.theme.colors.textMuted};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  margin-top: ${props => props.theme.spacing.md}px;
 `;
 
 const EmptyContainer = styled.View`
   align-items: center;
-  margin-top: 40px;
+  justify-content: center;
+  padding: ${props => props.theme.spacing.xl}px;
 `;
 
 const EmptyText = styled.Text`
+  color: ${props => props.theme.colors.textMuted};
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  margin-top: ${props => props.theme.spacing.md}px;
   text-align: center;
-  color: ${theme.colors.text};
-  font-size: 16px;
-  opacity: 0.7;
 `;
 
-const NotificationCard = styled.View<{ isRead: boolean }>`
-  background-color: ${(props) => props.isRead ? theme.colors.white : theme.colors.primary + '10'};
-  border-radius: 8px;
-  margin-bottom: 8px;
-  border-width: 1px;
-  border-color: ${(props) => props.isRead ? theme.colors.border : theme.colors.primary + '30'};
+const NotificationCard = styled.TouchableOpacity<{ isRead: boolean }>`
+  background-color: ${props => props.isRead
+    ? props.theme.colors.surface
+    : props.theme.colors.primaryLight
+  };
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  margin-bottom: ${props => props.theme.spacing.md}px;
+  border: 1px solid ${props => props.isRead
+    ? props.theme.colors.border
+    : props.theme.colors.primary + '30'
+  };
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
 `;
 
-const NotificationIcon = styled.Text`
-  font-size: 20px;
-  margin-right: 8px;
+const NotificationContent = styled.View`
+  padding: ${props => props.theme.spacing.lg}px;
 `;
 
 const NotificationHeader = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
+  margin-bottom: ${props => props.theme.spacing.sm}px;
+`;
+
+const NotificationIcon = styled.Text`
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  margin-right: ${props => props.theme.spacing.md}px;
+`;
+
+const NotificationInfo = styled.View`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const NotificationTitle = styled.Text`
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  font-weight: ${props => props.theme.typography.subtitle.fontWeight};
+  color: ${props => props.theme.colors.text};
+  flex: 1;
 `;
 
 const UnreadDot = styled.View`
   width: 8px;
   height: 8px;
   border-radius: 4px;
-  background-color: ${theme.colors.error};
-  margin-left: 8px;
+  background-color: ${props => props.theme.colors.error};
+  margin-left: ${props => props.theme.spacing.sm}px;
+`;
+
+const NotificationMessage = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.sm}px;
+  line-height: 22px;
 `;
 
 const DateText = styled.Text`
-  font-size: 12px;
-  color: ${theme.colors.text};
-  opacity: 0.6;
-  margin-top: 4px;
+  font-size: ${props => props.theme.typography.small.fontSize}px;
+  color: ${props => props.theme.colors.textMuted};
+`;
+
+const BackButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.surface};
+  border: 1px solid ${props => props.theme.colors.primary};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: ${props => props.theme.spacing.lg}px;
 `;
 
 export default NotificationsScreen;

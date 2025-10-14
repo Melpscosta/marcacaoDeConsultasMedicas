@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { ScrollView, ViewStyle, Alert, Share } from 'react-native';
-import { Button, ListItem, Switch, Text } from 'react-native-elements';
+import { ScrollView, View, Text, TouchableOpacity, Alert, Share, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
-import theme from '../styles/theme';
-import Header from '../components/Header';
 import { storageService } from '../services/storage';
 
 type SettingsScreenProps = {
@@ -149,8 +147,12 @@ const SettingsScreen: React.FC = () => {
   if (loading) {
     return (
       <Container>
-        <Header />
+        <Header>
+          <HeaderTitle>Configurações</HeaderTitle>
+          <HeaderSubtitle>Gerencie suas preferências</HeaderSubtitle>
+        </Header>
         <LoadingContainer>
+          <ActivityIndicator size="large" color={props => props.theme.colors.primary} />
           <LoadingText>Carregando configurações...</LoadingText>
         </LoadingContainer>
       </Container>
@@ -159,35 +161,35 @@ const SettingsScreen: React.FC = () => {
 
   return (
     <Container>
-      <Header />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Title>Configurações</Title>
+      <Header>
+        <HeaderTitle>Configurações</HeaderTitle>
+        <HeaderSubtitle>Gerencie suas preferências</HeaderSubtitle>
+      </Header>
 
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <SectionTitle>Preferências</SectionTitle>
         <SettingsCard>
-          <ListItem>
-            <ListItem.Content>
-              <ListItem.Title>Notificações</ListItem.Title>
-              <ListItem.Subtitle>Receber notificações push</ListItem.Subtitle>
-            </ListItem.Content>
-            <Switch
+          <SettingItem>
+            <SettingInfo>
+              <SettingTitle>Notificações</SettingTitle>
+              <SettingDescription>Receber notificações push</SettingDescription>
+            </SettingInfo>
+            <CustomSwitch
               value={settings.notifications}
               onValueChange={(value) => updateSetting('notifications', value)}
-              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
             />
-          </ListItem>
+          </SettingItem>
 
-          <ListItem>
-            <ListItem.Content>
-              <ListItem.Title>Backup Automático</ListItem.Title>
-              <ListItem.Subtitle>Criar backups automaticamente</ListItem.Subtitle>
-            </ListItem.Content>
-            <Switch
+          <SettingItem>
+            <SettingInfo>
+              <SettingTitle>Backup Automático</SettingTitle>
+              <SettingDescription>Criar backups automaticamente</SettingDescription>
+            </SettingInfo>
+            <CustomSwitch
               value={settings.autoBackup}
               onValueChange={(value) => updateSetting('autoBackup', value)}
-              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
             />
-          </ListItem>
+          </SettingItem>
         </SettingsCard>
 
         <SectionTitle>Dados e Armazenamento</SectionTitle>
@@ -206,35 +208,26 @@ const SettingsScreen: React.FC = () => {
           )}
         </SettingsCard>
 
-        <Button
-          title="Criar Backup"
-          onPress={handleCreateBackup}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.backupButton}
-          loading={loading}
-        />
+        <BackupButton onPress={handleCreateBackup} disabled={loading}>
+          <Ionicons name="download" size={20} color="#fff" />
+          <ButtonText>Criar Backup</ButtonText>
+        </BackupButton>
 
-        <Button
-          title="Limpar Cache"
-          onPress={handleClearCache}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.cacheButton}
-        />
+        <CacheButton onPress={handleClearCache}>
+          <Ionicons name="trash" size={20} color="#fff" />
+          <ButtonText>Limpar Cache</ButtonText>
+        </CacheButton>
 
         <SectionTitle>Ações Perigosas</SectionTitle>
-        <Button
-          title="Apagar Todos os Dados"
-          onPress={handleClearAllData}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.dangerButton}
-        />
+        <DangerButton onPress={handleClearAllData}>
+          <Ionicons name="warning" size={20} color="#fff" />
+          <ButtonText>Apagar Todos os Dados</ButtonText>
+        </DangerButton>
 
-        <Button
-          title="Voltar"
-          onPress={() => navigation.goBack()}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.buttonStyle}
-        />
+        <BackButton onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={20} color="#0066CC" />
+          <ButtonText>Voltar</ButtonText>
+        </BackButton>
       </ScrollView>
     </Container>
   );
@@ -243,32 +236,40 @@ const SettingsScreen: React.FC = () => {
 const styles = {
   scrollContent: {
     padding: 20,
-  },
-  button: {
-    marginBottom: 15,
-    width: '100%',
-  },
-  buttonStyle: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 12,
-  },
-  backupButton: {
-    backgroundColor: theme.colors.success,
-    paddingVertical: 12,
-  },
-  cacheButton: {
-    backgroundColor: theme.colors.warning,
-    paddingVertical: 12,
-  },
-  dangerButton: {
-    backgroundColor: theme.colors.error,
-    paddingVertical: 12,
+    flexGrow: 1,
   },
 };
 
 const Container = styled.View`
   flex: 1;
-  background-color: ${theme.colors.background};
+  background-color: ${props => props.theme.colors.background};
+`;
+
+const Header = styled.View`
+  background-color: ${props => props.theme.colors.primary};
+  padding-horizontal: ${props => props.theme.spacing.lg}px;
+  padding-vertical: ${props => props.theme.spacing.lg}px;
+  padding-top: ${props => props.theme.spacing.xl}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 4;
+`;
+
+const HeaderTitle = styled.Text`
+  font-size: ${props => props.theme.typography.heading.fontSize}px;
+  font-weight: ${props => props.theme.typography.heading.fontWeight};
+  color: ${props => props.theme.colors.white};
+  text-align: center;
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+`;
+
+const HeaderSubtitle = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.white};
+  opacity: 0.9;
+  text-align: center;
 `;
 
 const LoadingContainer = styled.View`
@@ -278,52 +279,149 @@ const LoadingContainer = styled.View`
 `;
 
 const LoadingText = styled.Text`
-  font-size: 16px;
-  color: ${theme.colors.text};
-`;
-
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 20px;
-  text-align: center;
+  color: ${props => props.theme.colors.textMuted};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  margin-top: ${props => props.theme.spacing.md}px;
 `;
 
 const SectionTitle = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 10px;
-  margin-top: 20px;
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  font-weight: ${props => props.theme.typography.subtitle.fontWeight};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.lg}px;
+  margin-top: ${props => props.theme.spacing.lg}px;
 `;
 
 const SettingsCard = styled.View`
-  background-color: ${theme.colors.white};
-  border-radius: 8px;
-  margin-bottom: 15px;
-  border-width: 1px;
-  border-color: ${theme.colors.border};
+  background-color: ${props => props.theme.colors.surface};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  margin-bottom: ${props => props.theme.spacing.lg}px;
+  border: 1px solid ${props => props.theme.colors.border};
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+const SettingItem = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: ${props => props.theme.spacing.lg}px;
+  border-bottom-width: 1px;
+  border-bottom-color: ${props => props.theme.colors.border}20;
+
+  &:last-child {
+    border-bottom-width: 0;
+  }
+`;
+
+const SettingInfo = styled.View`
+  flex: 1;
+`;
+
+const SettingTitle = styled.Text`
+  font-size: ${props => props.theme.typography.subtitle.fontSize}px;
+  font-weight: ${props => props.theme.typography.subtitle.fontWeight};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.xs}px;
+`;
+
+const SettingDescription = styled.Text`
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.textMuted};
+`;
+
+const CustomSwitch = styled.Switch`
+  transform: scale(0.8);
 `;
 
 const InfoItem = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
+  padding: ${props => props.theme.spacing.md}px ${props => props.theme.spacing.lg}px;
   border-bottom-width: 1px;
-  border-bottom-color: ${theme.colors.border};
+  border-bottom-color: ${props => props.theme.colors.border}20;
+
+  &:last-child {
+    border-bottom-width: 0;
+  }
 `;
 
 const InfoLabel = styled.Text`
-  font-size: 16px;
-  color: ${theme.colors.text};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  color: ${props => props.theme.colors.text};
 `;
 
 const InfoValue = styled.Text`
-  font-size: 16px;
-  font-weight: bold;
-  color: ${theme.colors.primary};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: 600;
+  color: ${props => props.theme.colors.primary};
+`;
+
+const BackupButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.success};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${props => props.theme.spacing.md}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+const CacheButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.warning};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${props => props.theme.spacing.md}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+const DangerButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.error};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${props => props.theme.spacing.md}px;
+  shadow-color: ${props => props.theme.colors.text};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+const BackButton = styled.TouchableOpacity`
+  background-color: ${props => props.theme.colors.surface};
+  border: 1px solid ${props => props.theme.colors.primary};
+  border-radius: ${props => props.theme.borderRadius.lg}px;
+  padding: ${props => props.theme.spacing.lg}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: ${props => props.theme.spacing.md}px;
+`;
+
+const ButtonText = styled.Text<{ color?: string }>`
+  color: ${props => props.color || props.theme.colors.white};
+  font-size: ${props => props.theme.typography.body.fontSize}px;
+  font-weight: ${props => props.theme.typography.body.fontWeight};
+  margin-left: ${props => props.theme.spacing.sm}px;
 `;
 
 export default SettingsScreen;
