@@ -1,141 +1,167 @@
 import React, { useState } from 'react';
-import styled from 'styled-components/native';
-import { Input, Button, Text } from 'react-native-elements';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
+import { Button, Input, ScreenLayout, ScreenHeader } from '../components/ui';
 import theme from '../styles/theme';
-import { ViewStyle } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import type { RootStackParamList } from '../types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/navigation';
 
 type RegisterScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Register'>;
 };
 
-const RegisterScreen: React.FC = () => {
+const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
   const { register } = useAuth();
-  const navigation = useNavigation<RegisterScreenProps['navigation']>();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    try {
-      setLoading(true);
-      setError('');
-
-      if (!name || !email || !password) {
-        setError('Por favor, preencha todos os campos');
-        return;
-      }
-
-      await register({
-        name,
-        email,
-        password,
-      });
-
-      // Após o registro bem-sucedido, navega para o login
-      navigation.navigate('Login');
-    } catch (err) {
-      setError('Erro ao criar conta. Tente novamente.');
-    } finally {
-      setLoading(false);
+    setError('');
+    setLoading(true);
+    const result = await register(name, email, password, confirmPassword);
+    setLoading(false);
+    if (result.success) {
+      // Navegação automática via troca de stack
+    } else {
+      setError(result.error || 'Erro ao cadastrar');
     }
   };
 
   return (
-    <Container>
-      <Title>Cadastro de Paciente</Title>
-      
-      <Input
-        placeholder="Nome completo"
-        value={name}
-        onChangeText={setName}
-        autoCapitalize="words"
-        containerStyle={styles.input}
+    <ScreenLayout scroll keyboardAvoiding safeAreaEdges={['bottom', 'left', 'right']}>
+      <ScreenHeader
+        title="Cadastro"
+        subtitle="Preencha os dados para criar sua conta"
+        variant="transparent"
+        onBack={() => navigation.goBack()}
+        accessibilityLabel="Tela de cadastro"
       />
 
-      <Input
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        containerStyle={styles.input}
-      />
+      <View style={{ paddingBottom: theme.spacing.xxl }}>
+        <Input
+          label="Nome completo"
+          placeholder="Seu nome"
+          value={name}
+          onChangeText={(t) => {
+            setName(t);
+            setError('');
+          }}
+          autoCapitalize="words"
+          accessibilityLabel="Campo de nome completo"
+        />
 
-      <Input
-        placeholder="Senha"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        containerStyle={styles.input}
-      />
+        <Input
+          label="Email"
+          placeholder="seu@email.com"
+          value={email}
+          onChangeText={(t) => {
+            setEmail(t);
+            setError('');
+          }}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          accessibilityLabel="Campo de email"
+        />
 
-      {error ? <ErrorText>{error}</ErrorText> : null}
+        <Input
+          label="Senha (mínimo 6 caracteres)"
+          placeholder="••••••••"
+          value={password}
+          onChangeText={(t) => {
+            setPassword(t);
+            setError('');
+          }}
+          secureTextEntry={!showPassword}
+          rightIcon={{
+            name: showPassword ? 'eye-off' : 'eye',
+            onPress: () => setShowPassword(!showPassword),
+            ariaLabel: showPassword ? 'Ocultar senha' : 'Mostrar senha',
+          }}
+          accessibilityLabel="Campo de senha"
+        />
 
-      <Button
-        title="Cadastrar"
-        onPress={handleRegister}
-        loading={loading}
-        containerStyle={styles.button as ViewStyle}
-        buttonStyle={styles.buttonStyle}
-      />
+        <Input
+          label="Confirmar senha"
+          placeholder="••••••••"
+          value={confirmPassword}
+          onChangeText={(t) => {
+            setConfirmPassword(t);
+            setError('');
+          }}
+          secureTextEntry
+          accessibilityLabel="Campo de confirmação de senha"
+        />
 
-      <Button
-        title="Voltar para Login"
-        onPress={() => navigation.navigate('Login')}
-        containerStyle={styles.backButton as ViewStyle}
-        buttonStyle={styles.backButtonStyle}
-      />
-    </Container>
+        {error ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: theme.spacing.sm,
+              padding: theme.spacing.sm,
+              backgroundColor: theme.colors.errorMuted,
+              borderRadius: theme.radius.sm,
+            }}
+            accessibilityLiveRegion="polite"
+            accessibilityRole="alert"
+          >
+            <Text style={{ color: theme.colors.error, fontSize: theme.typography.caption.fontSize, flex: 1 }}>
+              {error}
+            </Text>
+          </View>
+        ) : null}
+
+        <Button
+          onPress={handleRegister}
+          loading={loading}
+          fullWidth
+          style={{ marginTop: theme.spacing.lg }}
+          accessibilityLabel="Cadastrar conta"
+        >
+          Cadastrar
+        </Button>
+
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{
+            alignItems: 'center',
+            marginTop: theme.spacing.md,
+            padding: theme.spacing.md,
+            minHeight: theme.touchTarget,
+            justifyContent: 'center',
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="Voltar para login"
+        >
+          <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body.fontSize, fontWeight: '500' }}>
+            Já tem conta? Faça login
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{
+            alignItems: 'center',
+            marginTop: theme.spacing.sm,
+            padding: theme.spacing.sm,
+            minHeight: theme.touchTarget,
+            justifyContent: 'center',
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="Usar conta de demonstração"
+        >
+          <Text style={{ color: theme.colors.textMuted, fontSize: theme.typography.caption.fontSize }}>
+            Usar conta de demonstração
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScreenLayout>
   );
 };
 
-const styles = {
-  input: {
-    marginBottom: 15,
-  },
-  button: {
-    marginTop: 10,
-    width: '100%',
-  },
-  buttonStyle: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 12,
-  },
-  backButton: {
-    marginTop: 10,
-    width: '100%',
-  },
-  backButtonStyle: {
-    backgroundColor: theme.colors.secondary,
-    paddingVertical: 12,
-  },
-};
-
-const Container = styled.View`
-  flex: 1;
-  padding: 20px;
-  justify-content: center;
-  background-color: ${theme.colors.background};
-`;
-
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 30px;
-  color: ${theme.colors.text};
-`;
-
-const ErrorText = styled.Text`
-  color: ${theme.colors.error};
-  text-align: center;
-  margin-bottom: 10px;
-`;
-
-export default RegisterScreen; 
+export default RegisterScreen;

@@ -8,11 +8,11 @@ import theme from '../styles/theme';
 import type { RootStackParamList } from '../types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-type ProfileScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Profile'>;
+type DoctorProfileScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'DoctorProfile'>;
 };
 
-const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
+const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({ navigation }) => {
   const { user, logout } = useAuth();
   const insets = useSafeAreaInsets();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -57,7 +57,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         title="Meu Perfil"
         variant="primary"
         onBack={() => navigation.goBack()}
-        accessibilityLabel="Tela de perfil do usuário"
+        accessibilityLabel="Tela de perfil do médico"
       />
 
       <ScrollView
@@ -73,8 +73,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             style={styles.avatar}
             accessibilityIgnoresInvertColors
           />
-          <Text style={styles.name}>{user?.name || 'Usuário'}</Text>
+          <Text style={styles.name}>{user?.name || 'Médico'}</Text>
           <Text style={styles.email}>{user?.email || ''}</Text>
+          <View style={styles.roleBadge}>
+            <Text style={styles.roleBadgeText}>Médico</Text>
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -107,10 +110,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
+  container: { flex: 1, backgroundColor: theme.colors.background },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: theme.colors.overlay,
@@ -185,10 +185,20 @@ const styles = StyleSheet.create({
   email: {
     fontSize: theme.typography.body.fontSize,
     color: theme.colors.textMuted,
+    marginBottom: theme.spacing.sm,
   },
-  section: {
-    marginBottom: theme.spacing.md,
+  roleBadge: {
+    backgroundColor: theme.colors.primaryMuted,
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: theme.radius.full,
   },
+  roleBadgeText: {
+    fontSize: theme.typography.small.fontSize,
+    fontWeight: '600',
+    color: theme.colors.primary,
+  },
+  section: { marginBottom: theme.spacing.md },
   sectionTitle: {
     fontSize: theme.typography.h3.fontSize,
     fontWeight: '600',
@@ -207,9 +217,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
-  infoRowLast: {
-    borderBottomWidth: 0,
-  },
+  infoRowLast: { borderBottomWidth: 0 },
   infoLabel: {
     fontSize: theme.typography.body.fontSize,
     color: theme.colors.textMuted,
@@ -238,4 +246,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;
+export default DoctorProfileScreen;

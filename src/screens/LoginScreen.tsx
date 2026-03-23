@@ -1,138 +1,184 @@
 import React, { useState } from 'react';
-import styled from 'styled-components/native';
-import { Input, Button, Text } from 'react-native-elements';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Icon } from 'react-native-elements';
 import { useAuth } from '../contexts/AuthContext';
+import { Button, Input, ScreenLayout } from '../components/ui';
 import theme from '../styles/theme';
-import { ViewStyle } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import type { RootStackParamList } from '../types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/navigation';
 
 type LoginScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
 };
 
-const LoginScreen: React.FC = () => {
-  const { signIn } = useAuth();
-  const navigation = useNavigation<LoginScreenProps['navigation']>();
+const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      await signIn({ email, password });
-    } catch (err) {
-      setError('Email ou senha inválidos');
-    } finally {
-      setLoading(false);
+    setError('');
+    setLoading(true);
+    const result = await login(email, password);
+    setLoading(false);
+    if (result.success) {
+      // Navegação automática via troca de stack
+    } else {
+      setError(result.error || 'Erro ao fazer login');
     }
   };
 
+  const handleDemoLogin = (demoEmail: string, demoPassword: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+    setError('');
+  };
+
   return (
-    <Container>
-      <Title>Login</Title>
-      
+    <ScreenLayout scroll keyboardAvoiding>
+      <View style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.xl }}>
+        <Text
+          style={{
+            fontSize: theme.typography.h1.fontSize,
+            fontWeight: '700',
+            color: theme.colors.primary,
+            marginBottom: theme.spacing.sm,
+          }}
+          accessibilityRole="header"
+        >
+          HealthConnect
+        </Text>
+        <Text
+          style={{
+            fontSize: theme.typography.body.fontSize,
+            color: theme.colors.textMuted,
+          }}
+        >
+          Agendamento de consultas médicas
+        </Text>
+      </View>
+
       <Input
-        placeholder="Email"
+        label="Email"
+        placeholder="seu@email.com"
         value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
+        onChangeText={(t) => {
+          setEmail(t);
+          setError('');
+        }}
         keyboardType="email-address"
-        containerStyle={styles.input}
+        autoCapitalize="none"
+        autoCorrect={false}
+        accessibilityLabel="Campo de email"
       />
 
       <Input
-        placeholder="Senha"
+        label="Senha"
+        placeholder="••••••••"
         value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        containerStyle={styles.input}
+        onChangeText={(t) => {
+          setPassword(t);
+          setError('');
+        }}
+        secureTextEntry={!showPassword}
+        rightIcon={{
+          name: showPassword ? 'eye-off' : 'eye',
+          onPress: () => setShowPassword(!showPassword),
+          ariaLabel: showPassword ? 'Ocultar senha' : 'Mostrar senha',
+        }}
+        accessibilityLabel="Campo de senha"
       />
 
-      {error ? <ErrorText>{error}</ErrorText> : null}
+      {error ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: theme.spacing.sm,
+            padding: theme.spacing.sm,
+            backgroundColor: theme.colors.errorMuted,
+            borderRadius: theme.radius.sm,
+          }}
+          accessibilityLiveRegion="polite"
+          accessibilityRole="alert"
+        >
+          <Icon name="alert-circle" type="ionicon" size={18} color={theme.colors.error} style={{ marginRight: 8 }} />
+          <Text style={{ color: theme.colors.error, fontSize: theme.typography.caption.fontSize, flex: 1 }}>
+            {error}
+          </Text>
+        </View>
+      ) : null}
 
       <Button
-        title="Entrar"
         onPress={handleLogin}
         loading={loading}
-        containerStyle={styles.button as ViewStyle}
-        buttonStyle={styles.buttonStyle}
-      />
+        fullWidth
+        style={{ marginTop: theme.spacing.lg }}
+        accessibilityLabel="Entrar na conta"
+      >
+        Entrar
+      </Button>
 
-      <Button
-        title="Cadastrar Novo Paciente"
+      <TouchableOpacity
         onPress={() => navigation.navigate('Register')}
-        containerStyle={styles.registerButton as ViewStyle}
-        buttonStyle={styles.registerButtonStyle}
-      />
+        style={{
+          alignItems: 'center',
+          marginTop: theme.spacing.md,
+          padding: theme.spacing.md,
+          minHeight: theme.touchTarget,
+          justifyContent: 'center',
+        }}
+        accessibilityRole="button"
+        accessibilityLabel="Ir para cadastro"
+      >
+        <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body.fontSize, fontWeight: '500' }}>
+          Não tem conta? Cadastre-se
+        </Text>
+      </TouchableOpacity>
 
-      <Text style={styles.hint}>
-        Use as credenciais de exemplo:
-      </Text>
-      <Text style={styles.credentials}>
-        Admin: admin@example.com / 123456{'\n'}
-        Médicos: joao@example.com, maria@example.com, pedro@example.com / 123456
-      </Text>
-    </Container>
+      <View
+        style={{
+          marginTop: theme.spacing.xl * 1.5,
+          paddingTop: theme.spacing.lg,
+          borderTopWidth: 1,
+          borderTopColor: theme.colors.border,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: theme.typography.caption.fontSize,
+            color: theme.colors.textMuted,
+            marginBottom: theme.spacing.md,
+          }}
+        >
+          Contas de demonstração
+        </Text>
+        <TouchableOpacity
+          onPress={() => handleDemoLogin('teste@paciente.com', '123456')}
+          style={{ paddingVertical: theme.spacing.sm, minHeight: theme.touchTarget, justifyContent: 'center' }}
+          accessibilityRole="button"
+          accessibilityLabel="Usar conta do paciente João Teste"
+        >
+          <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body.fontSize }}>
+            Paciente (João Teste)
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => handleDemoLogin('joao@example.com', '123456')}
+          style={{ paddingVertical: theme.spacing.sm, minHeight: theme.touchTarget, justifyContent: 'center' }}
+          accessibilityRole="button"
+          accessibilityLabel="Usar conta do médico Dr. João Silva"
+        >
+          <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body.fontSize }}>
+            Médico (Dr. João Silva)
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScreenLayout>
   );
 };
 
-const styles = {
-  input: {
-    marginBottom: 15,
-  },
-  button: {
-    marginTop: 10,
-    width: '100%',
-  },
-  buttonStyle: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 12,
-  },
-  registerButton: {
-    marginTop: 10,
-    width: '100%',
-  },
-  registerButtonStyle: {
-    backgroundColor: theme.colors.secondary,
-    paddingVertical: 12,
-  },
-  hint: {
-    marginTop: 20,
-    textAlign: 'center' as const,
-    color: theme.colors.text,
-  },
-  credentials: {
-    marginTop: 10,
-    textAlign: 'center' as const,
-    color: theme.colors.text,
-    fontSize: 12,
-  },
-};
-
-const Container = styled.View`
-  flex: 1;
-  padding: 20px;
-  justify-content: center;
-  background-color: ${theme.colors.background};
-`;
-
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 30px;
-  color: ${theme.colors.text};
-`;
-
-const ErrorText = styled.Text`
-  color: ${theme.colors.error};
-  text-align: center;
-  margin-bottom: 10px;
-`;
-
-export default LoginScreen; 
+export default LoginScreen;

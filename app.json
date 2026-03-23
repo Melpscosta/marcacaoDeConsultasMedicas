@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "marcacaoDeConsultasMedicas",
-    "slug": "marcacaoDeConsultasMedicas",
+    "name": "Marcação de Consulta Médica",
+    "slug": "marcacao-consulta-medica",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

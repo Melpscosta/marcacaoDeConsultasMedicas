@@ -1,62 +1,51 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components/native';
-import { FlatList, RefreshControl, TouchableOpacity } from 'react-native';
-import { Button, Icon } from 'react-native-elements';
-import { FontAwesome } from '@expo/vector-icons';
-import { HeaderContainer, HeaderTitle } from '../components/Header';
+import React, { useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+  Image,
+  StyleSheet,
+} from 'react-native';
+import { Icon } from 'react-native-elements';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAuth } from '../contexts/AuthContext';
+import { getAppointments, updateAppointmentStatus } from '../services/storage';
+import StatusBadge from '../components/StatusBadge';
+import { Card } from '../components/ui';
 import theme from '../styles/theme';
+import type { Appointment, RootStackParamList } from '../types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Appointment } from '../types/appointments';
-import { Doctor } from '../types/doctors';
-import { RootStackParamList } from '../types/navigation';
-import { useFocusEffect } from '@react-navigation/native';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
 };
 
-const doctors: Doctor[] = [
-  {
-    id: '1',
-    name: 'Dr. João Silva',
-    specialty: 'Cardiologista',
-    image: 'https://mighty.tools/mockmind-api/content/human/91.jpg',
-  },
-  {
-    id: '2',
-    name: 'Dra. Maria Santos',
-    specialty: 'Dermatologista',
-    image: 'https://mighty.tools/mockmind-api/content/human/97.jpg',
-  },
-  {
-    id: '3',
-    name: 'Dr. Pedro Oliveira',
-    specialty: 'Oftalmologista',
-    image: 'https://mighty.tools/mockmind-api/content/human/79.jpg',
-  },
-];
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'Bom dia';
+  if (h < 18) return 'Boa tarde';
+  return 'Boa noite';
+}
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const { user, logout } = useAuth();
+  const insets = useSafeAreaInsets();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadAppointments = async () => {
-    try {
-      const storedAppointments = await AsyncStorage.getItem('appointments');
-      if (storedAppointments) {
-        setAppointments(JSON.parse(storedAppointments));
-      }
-    } catch (error) {
-      console.error('Erro ao carregar consultas:', error);
-    }
-  };
+  const loadAppointments = useCallback(async () => {
+    if (!user) return;
+    const list = await getAppointments(user.id);
+    setAppointments(list);
+  }, [user]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      loadAppointments();
-    }, [])
-  );
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', loadAppointments);
+    loadAppointments();
+    return unsubscribe;
+  }, [loadAppointments, navigation]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -64,167 +53,257 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     setRefreshing(false);
   };
 
-  const getDoctorInfo = (doctorId: string): Doctor | undefined => {
-    return doctors.find(doctor => doctor.id === doctorId);
+  const handleCancel = async (id: string) => {
+    try {
+      await updateAppointmentStatus(id, 'cancelled');
+      await loadAppointments();
+    } catch {
+      // ignore
+    }
   };
 
-  const renderAppointment = ({ item }: { item: Appointment }) => {
-    const doctor = getDoctorInfo(item.doctorId);
-    
-    return (
-      <AppointmentCard>
-        <DoctorImage source={{ uri: doctor?.image || 'https://via.placeholder.com/100' }} />
-        <InfoContainer>
-          <DoctorName>{doctor?.name || 'Médico não encontrado'}</DoctorName>
-          <DoctorSpecialty>{doctor?.specialty || 'Especialidade não encontrada'}</DoctorSpecialty>
-          <DateTime>{new Date(item.date).toLocaleDateString()} - {item.time}</DateTime>
-          <Description>{item.description}</Description>
-          <Status status={item.status}>
-            {item.status === 'pending' ? 'Pendente' : 'Confirmado'}
-          </Status>
-          <ActionButtons>
-            <ActionButton>
-              <Icon name="edit" type="material" size={20} color={theme.colors.primary} />
-            </ActionButton>
-            <ActionButton>
-              <Icon name="delete" type="material" size={20} color={theme.colors.error} />
-            </ActionButton>
-          </ActionButtons>
-        </InfoContainer>
-      </AppointmentCard>
-    );
-  };
+  const firstName = user?.name?.split(' ')[0] || 'Usuário';
+  const scheduledCount = appointments.filter((a) => a.status !== 'cancelled').length;
+  const pendingCount = appointments.filter((a) => a.status === 'pending').length;
 
   return (
-    <Container>
-      <HeaderContainer>
-        <HeaderTitle>Minhas Consultas</HeaderTitle>
-      </HeaderContainer>
+    <View style={styles.container}>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: insets.top + theme.spacing.md,
+            paddingBottom: theme.spacing.lg,
+            paddingHorizontal: theme.spacing.md,
+          },
+        ]}
+      >
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={styles.logo}>HealthConnect</Text>
+            <Text style={styles.greeting}>
+              {getGreeting()}, {firstName}!
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Profile')}
+            style={styles.iconButton}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir perfil"
+          >
+            <Icon name="person" type="ionicon" size={24} color={theme.colors.white} />
+          </TouchableOpacity>
+        </View>
+      </View>
 
-      <Content>
-        <Button
-          title="Agendar Nova Consulta"
-          icon={
-            <FontAwesome
-              name="calendar-plus-o"
-              size={20}
-              color="white"
-              style={{ marginRight: 8 }}
-            />
-          }
-          buttonStyle={{
-            backgroundColor: theme.colors.primary,
-            borderRadius: 8,
-            padding: 12,
-            marginBottom: theme.spacing.medium
-          }}
+      <View
+        style={[
+          styles.statsRow,
+          {
+            paddingHorizontal: Math.max(insets.left, insets.right, theme.spacing.md),
+          },
+        ]}
+      >
+        <View style={[styles.statCard, theme.shadows.md]}>
+          <Text style={styles.statNumber}>{scheduledCount}</Text>
+          <Text style={styles.statLabel}>Consultas agendadas</Text>
+        </View>
+        <View style={[styles.statCard, theme.shadows.md]}>
+          <Text style={styles.statNumber}>{pendingCount}</Text>
+          <Text style={styles.statLabel}>Pendentes</Text>
+        </View>
+      </View>
+
+      <View
+        style={[
+          styles.content,
+          {
+            paddingHorizontal: Math.max(insets.left, insets.right, theme.spacing.md),
+            paddingBottom: insets.bottom + theme.spacing.lg,
+          },
+        ]}
+      >
+        <TouchableOpacity
           onPress={() => navigation.navigate('CreateAppointment')}
-        />
+          style={styles.actionButton}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Agendar nova consulta"
+        >
+          <Icon name="add" type="ionicon" size={24} color={theme.colors.white} />
+          <Text style={styles.actionButtonText}>Agendar Nova Consulta</Text>
+        </TouchableOpacity>
 
-        <AppointmentList
+        <FlatList
           data={appointments}
-          keyExtractor={(item: Appointment) => item.id}
-          renderItem={renderAppointment}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Card
+              onPress={() => navigation.navigate('AppointmentDetail', { appointmentId: item.id })}
+              style={styles.appointmentCard}
+              accessibilityLabel={`Consulta com ${item.doctor.name}, ${item.date} às ${item.time}`}
+            >
+              <Image source={{ uri: item.doctor.image }} style={styles.doctorImage} />
+              <View style={styles.appointmentInfo}>
+                <Text style={styles.doctorName}>{item.doctor.name}</Text>
+                <Text style={styles.specialty}>{item.doctor.specialty}</Text>
+                <Text style={styles.dateTime}>
+                  {item.date} - {item.time}
+                </Text>
+                <View style={styles.statusRow}>
+                  <StatusBadge status={item.status} />
+                  {item.status !== 'cancelled' && (
+                    <TouchableOpacity
+                      onPress={() => handleCancel(item.id)}
+                      style={styles.cancelButton}
+                      hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Cancelar consulta com ${item.doctor.name}`}
+                    >
+                      <Text style={styles.cancelText}>Cancelar</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            </Card>
+          )}
           ListEmptyComponent={
-            <EmptyText>Nenhuma consulta agendada</EmptyText>
+            <Text style={styles.emptyText}>
+              Nenhuma consulta agendada. Toque em "Agendar Nova Consulta" para começar.
+            </Text>
           }
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[theme.colors.primary]} />
+          }
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: theme.spacing.xl }}
+          showsVerticalScrollIndicator={false}
         />
-      </Content>
-    </Container>
+      </View>
+    </View>
   );
 };
 
-const Container = styled.View`
-  flex: 1;
-  background-color: ${theme.colors.background};
-`;
-
-const Content = styled.View`
-  flex: 1;
-  padding: ${theme.spacing.medium}px;
-`;
-
-const AppointmentList = styled(FlatList)`
-  flex: 1;
-`;
-
-const AppointmentCard = styled.View`
-  background-color: ${theme.colors.white};
-  border-radius: 8px;
-  padding: ${theme.spacing.medium}px;
-  margin-bottom: ${theme.spacing.medium}px;
-  flex-direction: row;
-  align-items: center;
-  elevation: 2;
-  shadow-color: #000;
-  shadow-opacity: 0.1;
-  shadow-radius: 4px;
-  shadow-offset: 0px 2px;
-`;
-
-const DoctorImage = styled.Image`
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
-  margin-right: ${theme.spacing.medium}px;
-`;
-
-const InfoContainer = styled.View`
-  flex: 1;
-`;
-
-const DoctorName = styled.Text`
-  font-size: ${theme.typography.subtitle.fontSize}px;
-  font-weight: ${theme.typography.subtitle.fontWeight};
-  color: ${theme.colors.text};
-`;
-
-const DoctorSpecialty = styled.Text`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${theme.colors.text};
-  opacity: 0.8;
-  margin-bottom: 4px;
-`;
-
-const DateTime = styled.Text`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${theme.colors.primary};
-  margin-top: 4px;
-`;
-
-const Description = styled.Text`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${theme.colors.text};
-  opacity: 0.8;
-  margin-top: 4px;
-`;
-
-const Status = styled.Text<{ status: string }>`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${(props: { status: string }) => props.status === 'pending' ? theme.colors.error : theme.colors.success};
-  margin-top: 4px;
-  font-weight: bold;
-`;
-
-const ActionButtons = styled.View`
-  flex-direction: row;
-  justify-content: flex-end;
-  margin-top: ${theme.spacing.small}px;
-`;
-
-const ActionButton = styled(TouchableOpacity)`
-  padding: ${theme.spacing.small}px;
-  margin-left: ${theme.spacing.small}px;
-`;
-
-const EmptyText = styled.Text`
-  text-align: center;
-  color: ${theme.colors.text};
-  opacity: 0.6;
-  margin-top: ${theme.spacing.large}px;
-`;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  header: {
+    backgroundColor: theme.colors.primary,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  logo: {
+    fontSize: theme.typography.small.fontSize,
+    color: 'rgba(255,255,255,0.85)',
+    marginBottom: 4,
+  },
+  greeting: {
+    fontSize: theme.typography.h1.fontSize,
+    fontWeight: '700',
+    color: theme.colors.white,
+  },
+  iconButton: {
+    width: theme.touchTarget,
+    height: theme.touchTarget,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    marginTop: -theme.spacing.md,
+    gap: theme.spacing.md,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: theme.colors.primary,
+  },
+  statLabel: {
+    fontSize: theme.typography.small.fontSize,
+    color: theme.colors.textMuted,
+    marginTop: 4,
+  },
+  content: {
+    flex: 1,
+    paddingTop: theme.spacing.md,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.secondary,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    minHeight: theme.touchTarget,
+  },
+  actionButtonText: {
+    fontSize: theme.typography.body.fontSize,
+    fontWeight: '600',
+    color: theme.colors.white,
+  },
+  appointmentCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.md,
+  },
+  doctorImage: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    marginRight: theme.spacing.md,
+  },
+  appointmentInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
+  doctorName: {
+    fontSize: theme.typography.h3.fontSize,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  specialty: {
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.colors.textMuted,
+  },
+  dateTime: {
+    fontSize: theme.typography.body.fontSize,
+    color: theme.colors.primary,
+    marginTop: 4,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 8,
+  },
+  cancelButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  cancelText: {
+    fontSize: theme.typography.small.fontSize,
+    color: theme.colors.error,
+    fontWeight: '500',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: theme.colors.textMuted,
+    marginTop: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.md,
+    fontSize: theme.typography.body.fontSize,
+  },
+});
 
 export default HomeScreen;
