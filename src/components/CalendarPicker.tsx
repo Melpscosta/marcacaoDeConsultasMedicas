@@ -102,8 +102,8 @@ export default function CalendarPicker({ selectedDate, onSelectDate, minDate = n
 const Container = styled.View`
   background-color: ${theme.colors.white};
   border-radius: 12px;
-  padding: ${theme.spacing.medium}px;
-  margin-bottom: ${theme.spacing.medium}px;
+  padding: ${theme.spacing.medium || theme.spacing.md}px;
+  margin-bottom: ${theme.spacing.medium || theme.spacing.md}px;
   shadow-color: #000;
   shadow-opacity: 0.08;
   shadow-radius: 8px;
@@ -114,11 +114,11 @@ const MonthNav = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${theme.spacing.medium}px;
+  margin-bottom: ${theme.spacing.medium || theme.spacing.md}px;
 `;
 
 const NavButton = styled.TouchableOpacity`
-  padding: ${theme.spacing.small}px;
+  padding: ${theme.spacing.small || theme.spacing.sm}px;
 `;
 
 const NavText = styled.Text`
@@ -128,20 +128,20 @@ const NavText = styled.Text`
 `;
 
 const MonthTitle = styled.Text`
-  font-size: ${theme.typography.subtitle.fontSize}px;
+  font-size: ${theme.typography.subtitle?.fontSize || 18}px;
   font-weight: 600;
   color: ${theme.colors.text};
 `;
 
 const WeekdayRow = styled.View`
   flex-direction: row;
-  margin-bottom: ${theme.spacing.small}px;
+  margin-bottom: ${theme.spacing.small || theme.spacing.sm}px;
 `;
 
 const WeekdayCell = styled.Text`
   flex: 1;
   text-align: center;
-  font-size: ${theme.typography.small.fontSize}px;
+  font-size: ${theme.typography.small?.fontSize || 12}px;
   color: ${theme.colors.textMuted};
 `;
 
@@ -161,7 +161,7 @@ const DayCell = styled.TouchableOpacity<{ selected?: boolean; disabled?: boolean
 `;
 
 const DayText = styled.Text<{ selected?: boolean; disabled?: boolean }>`
-  font-size: ${theme.typography.body.fontSize}px;
+  font-size: ${theme.typography.body?.fontSize || 16}px;
   color: ${(p: { selected?: boolean; disabled?: boolean }) => (p.selected ? theme.colors.white : p.disabled ? theme.colors.textMuted : theme.colors.text)};
   font-weight: ${(p: { selected?: boolean }) => (p.selected ? '600' : '400')};
 `;

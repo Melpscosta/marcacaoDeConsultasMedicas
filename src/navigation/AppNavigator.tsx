@@ -8,11 +8,15 @@ import { RootStackParamList } from '../types/navigation';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
-import CreateAppointmentScreen from '../screens/CreateAppointmentScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import CreateAppointmentScreen from '../screens/CreateAppointmentScreen/index';
+import ProfileScreen from '../screens/ProfileScreen/index';
 import AdminDashboardScreen from '../screens/AdminDashboardScreen';
 import DoctorDashboardScreen from '../screens/DoctorDashboardScreen';
 import PatientDashboardScreen from '../screens/PatientDashboardScreen';
+import EditProfileScreen from '../screens/EditProfileScreen/index';
+import NotificationsScreen from '../screens/NotificationsScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+import UserManagementScreen from '../screens/UserManagementScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -40,11 +44,18 @@ export const AppNavigator: React.FC = () => {
           // Rotas protegidas
           <>
             {user.role === 'admin' && (
-              <Stack.Screen 
-                name="AdminDashboard" 
-                component={AdminDashboardScreen}
-                options={{ title: 'Painel Administrativo' }}
-              />
+              <>
+                <Stack.Screen
+                  name="AdminDashboard"
+                  component={AdminDashboardScreen}
+                  options={{ title: 'Painel Administrativo' }}
+                />
+                <Stack.Screen
+                  name="UserManagement"
+                  component={UserManagementScreen}
+                  options={{ title: 'Gerenciar Usuários' }}
+                />
+              </>
             )}
             
             {user.role === 'doctor' && (
@@ -78,6 +89,21 @@ export const AppNavigator: React.FC = () => {
               name="Profile" 
               component={ProfileScreen}
               options={{ title: 'Perfil' }}
+            />
+            <Stack.Screen 
+              name="EditProfile" 
+              component={EditProfileScreen}
+              options={{ title: 'Editar Perfil' }}
+            />
+            <Stack.Screen 
+              name="Notifications" 
+              component={NotificationsScreen}
+              options={{ title: 'Notificações' }}
+            />
+            <Stack.Screen 
+              name="Settings" 
+              component={SettingsScreen}
+              options={{ title: 'Configurações' }}
             />
           </>
         )}

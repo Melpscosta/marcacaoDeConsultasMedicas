@@ -42,7 +42,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       <View style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.xl }}>
         <Text
           style={{
-            fontSize: theme.typography.h1.fontSize,
+            fontSize: theme.typography.h1?.fontSize || theme.typography.title?.fontSize || 28,
             fontWeight: '700',
             color: theme.colors.primary,
             marginBottom: theme.spacing.sm,
@@ -53,7 +53,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         </Text>
         <Text
           style={{
-            fontSize: theme.typography.body.fontSize,
+            fontSize: theme.typography.body?.fontSize || 16,
             color: theme.colors.textMuted,
           }}
         >
@@ -99,14 +99,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             alignItems: 'center',
             marginTop: theme.spacing.sm,
             padding: theme.spacing.sm,
-            backgroundColor: theme.colors.errorMuted,
-            borderRadius: theme.radius.sm,
+            backgroundColor: theme.colors.errorMuted || 'rgba(229, 62, 62, 0.12)',
+            borderRadius: theme.radius?.sm || 8,
           }}
           accessibilityLiveRegion="polite"
           accessibilityRole="alert"
         >
           <Icon name="alert-circle" type="ionicon" size={18} color={theme.colors.error} style={{ marginRight: 8 }} />
-          <Text style={{ color: theme.colors.error, fontSize: theme.typography.caption.fontSize, flex: 1 }}>
+          <Text style={{ color: theme.colors.error, fontSize: theme.typography.caption?.fontSize || 14, flex: 1 }}>
             {error}
           </Text>
         </View>
@@ -128,20 +128,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           alignItems: 'center',
           marginTop: theme.spacing.md,
           padding: theme.spacing.md,
-          minHeight: theme.touchTarget,
+          minHeight: theme.touchTarget || 44,
           justifyContent: 'center',
         }}
         accessibilityRole="button"
         accessibilityLabel="Ir para cadastro"
       >
-        <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body.fontSize, fontWeight: '500' }}>
+        <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body?.fontSize || 16, fontWeight: '500' }}>
           Não tem conta? Cadastre-se
         </Text>
       </TouchableOpacity>
 
       <View
         style={{
-          marginTop: theme.spacing.xl * 1.5,
+          marginTop: (theme.spacing.xl || 32) * 1.5,
           paddingTop: theme.spacing.lg,
           borderTopWidth: 1,
           borderTopColor: theme.colors.border,
@@ -149,7 +149,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       >
         <Text
           style={{
-            fontSize: theme.typography.caption.fontSize,
+            fontSize: theme.typography.caption?.fontSize || 14,
             color: theme.colors.textMuted,
             marginBottom: theme.spacing.md,
           }}
@@ -158,21 +158,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         </Text>
         <TouchableOpacity
           onPress={() => handleDemoLogin('teste@paciente.com', '123456')}
-          style={{ paddingVertical: theme.spacing.sm, minHeight: theme.touchTarget, justifyContent: 'center' }}
+          style={{ paddingVertical: theme.spacing.sm, minHeight: theme.touchTarget || 44, justifyContent: 'center' }}
           accessibilityRole="button"
           accessibilityLabel="Usar conta do paciente João Teste"
         >
-          <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body.fontSize }}>
+          <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body?.fontSize || 16 }}>
             Paciente (João Teste)
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => handleDemoLogin('joao@example.com', '123456')}
-          style={{ paddingVertical: theme.spacing.sm, minHeight: theme.touchTarget, justifyContent: 'center' }}
+          style={{ paddingVertical: theme.spacing.sm, minHeight: theme.touchTarget || 44, justifyContent: 'center' }}
           accessibilityRole="button"
           accessibilityLabel="Usar conta do médico Dr. João Silva"
         >
-          <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body.fontSize }}>
+          <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body?.fontSize || 16 }}>
             Médico (Dr. João Silva)
           </Text>
         </TouchableOpacity>

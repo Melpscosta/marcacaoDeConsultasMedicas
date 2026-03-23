@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, LoginCredentials, RegisterData, AuthResponse } from '../types/auth';
+import { getProfileImage } from './profileImages';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
@@ -16,7 +17,7 @@ const mockDoctors = [
     email: 'joao@example.com',
     role: 'doctor' as const,
     specialty: 'Cardiologia',
-    image: 'https://randomuser.me/api/portraits/men/1.jpg',
+    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
   },
   {
     id: '2',
@@ -24,7 +25,7 @@ const mockDoctors = [
     email: 'maria@example.com',
     role: 'doctor' as const,
     specialty: 'Pediatria',
-    image: 'https://randomuser.me/api/portraits/women/1.jpg',
+    image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
   },
   {
     id: '3',
@@ -32,7 +33,23 @@ const mockDoctors = [
     email: 'pedro@example.com',
     role: 'doctor' as const,
     specialty: 'Ortopedia',
-    image: 'https://randomuser.me/api/portraits/men/2.jpg',
+    image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face',
+  },
+  {
+    id: '4',
+    name: 'Dra. Ana Costa',
+    email: 'ana.doctor@example.com',
+    role: 'doctor' as const,
+    specialty: 'Dermatologia',
+    image: 'https://images.unsplash.com/photo-1594824475063-1b1ad4e6c0c6?w=150&h=150&fit=crop&crop=face',
+  },
+  {
+    id: '5',
+    name: 'Dr. Carlos Mendes',
+    email: 'carlos.doctor@example.com',
+    role: 'doctor' as const,
+    specialty: 'Clínico Geral',
+    image: 'https://images.unsplash.com/photo-1618498082410-b4aa8211a357?w=150&h=150&fit=crop&crop=face',
   },
 ];
 
@@ -42,11 +59,53 @@ const mockAdmin = {
   name: 'Administrador',
   email: 'admin@example.com',
   role: 'admin' as const,
-  image: 'https://randomuser.me/api/portraits/men/3.jpg',
+  image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face',
 };
 
 // Lista de usuários cadastrados (pacientes)
-let registeredUsers: User[] = [];
+let registeredUsers: (User & { password: string })[] = [
+  // Pacientes de exemplo para testes
+  {
+    id: 'patient-example-1',
+    name: 'Ana Paciente',
+    email: 'ana@exemplo.com',
+    role: 'patient' as const,
+    image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+    password: '123456',
+  },
+  {
+    id: 'patient-example-2',
+    name: 'Carlos Paciente',
+    email: 'carlos@exemplo.com',
+    role: 'patient' as const,
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    password: '123456',
+  },
+  {
+    id: 'patient-example-3',
+    name: 'Maria Paciente',
+    email: 'maria@exemplo.com',
+    role: 'patient' as const,
+    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+    password: '123456',
+  },
+  {
+    id: 'patient-test-1',
+    name: 'João Teste',
+    email: 'teste@paciente.com',
+    role: 'patient' as const,
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    password: '123456',
+  },
+  {
+    id: 'patient-test-2',
+    name: 'Pedro Usuário',
+    email: 'pedro@usuario.com',
+    role: 'patient' as const,
+    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+    password: '123456',
+  }
+];
 
 export const authService = {
   async signIn(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -74,10 +133,12 @@ export const authService = {
       (p) => p.email === credentials.email
     );
     if (patient) {
-      // Para pacientes, a senha padrão é 123456
-      if (credentials.password === '123456') {
+      // Verifica a senha do paciente
+      if (credentials.password === patient.password) {
+        // Remove a senha do objeto antes de retornar
+        const { password, ...patientWithoutPassword } = patient;
         return {
-          user: patient,
+          user: patientWithoutPassword,
           token: `patient-token-${patient.id}`,
         };
       }
@@ -97,14 +158,13 @@ export const authService = {
     }
 
     // Cria um novo paciente
-    const newPatient: User = {
-      id: `patient-${registeredUsers.length + 1}`,
+    const newPatient: User & { password: string } = {
+      id: `patient-${registeredUsers.length + 4}`,
       name: data.name,
       email: data.email,
       role: 'patient' as const,
-      image: `https://randomuser.me/api/portraits/${registeredUsers.length % 2 === 0 ? 'men' : 'women'}/${
-        registeredUsers.length + 1
-      }.jpg`,
+      image: getProfileImage(data.name, 'patient'),
+      password: data.password,
     };
 
     registeredUsers.push(newPatient);
@@ -112,8 +172,10 @@ export const authService = {
     // Salva a lista atualizada de usuários
     await AsyncStorage.setItem(STORAGE_KEYS.REGISTERED_USERS, JSON.stringify(registeredUsers));
 
+    // Remove a senha do objeto antes de retornar
+    const { password, ...patientWithoutPassword } = newPatient;
     return {
-      user: newPatient,
+      user: patientWithoutPassword,
       token: `patient-token-${newPatient.id}`,
     };
   },

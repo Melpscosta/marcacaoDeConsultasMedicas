@@ -42,7 +42,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
         accessibilityLabel="Tela de cadastro"
       />
 
-      <View style={{ paddingBottom: theme.spacing.xxl }}>
+      <View style={{ paddingBottom: theme.spacing.xxl || 48 }}>
         <Input
           label="Nome completo"
           placeholder="Seu nome"
@@ -104,13 +104,13 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
               alignItems: 'center',
               marginTop: theme.spacing.sm,
               padding: theme.spacing.sm,
-              backgroundColor: theme.colors.errorMuted,
-              borderRadius: theme.radius.sm,
+              backgroundColor: theme.colors.errorMuted || 'rgba(229, 62, 62, 0.12)',
+              borderRadius: theme.radius?.sm || 8,
             }}
             accessibilityLiveRegion="polite"
             accessibilityRole="alert"
           >
-            <Text style={{ color: theme.colors.error, fontSize: theme.typography.caption.fontSize, flex: 1 }}>
+            <Text style={{ color: theme.colors.error, fontSize: theme.typography.caption?.fontSize || 14, flex: 1 }}>
               {error}
             </Text>
           </View>
@@ -132,13 +132,13 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
             alignItems: 'center',
             marginTop: theme.spacing.md,
             padding: theme.spacing.md,
-            minHeight: theme.touchTarget,
+            minHeight: theme.touchTarget || 44,
             justifyContent: 'center',
           }}
           accessibilityRole="button"
           accessibilityLabel="Voltar para login"
         >
-          <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body.fontSize, fontWeight: '500' }}>
+          <Text style={{ color: theme.colors.primary, fontSize: theme.typography.body?.fontSize || 16, fontWeight: '500' }}>
             Já tem conta? Faça login
           </Text>
         </TouchableOpacity>
@@ -149,13 +149,13 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
             alignItems: 'center',
             marginTop: theme.spacing.sm,
             padding: theme.spacing.sm,
-            minHeight: theme.touchTarget,
+            minHeight: theme.touchTarget || 44,
             justifyContent: 'center',
           }}
           accessibilityRole="button"
           accessibilityLabel="Usar conta de demonstração"
         >
-          <Text style={{ color: theme.colors.textMuted, fontSize: theme.typography.caption.fontSize }}>
+          <Text style={{ color: theme.colors.textMuted, fontSize: theme.typography.caption?.fontSize || 14 }}>
             Usar conta de demonstração
           </Text>
         </TouchableOpacity>
